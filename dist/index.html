@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mzansiway — My Landlord's Days Are Numbered</title>
+  <link rel="icon" type="image/png" href="mzansiway_icon_512x512.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange: #FF9800;
+      --green: #50C878;
+      --dark: #0a0a0a;
+      --dark2: #111111;
+      --dark3: #1a1a1a;
+      --white: #ffffff;
+      --grey: #aaaaaa;
+      --sidebar-w: 340px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: var(--dark); font-family: 'Barlow', sans-serif; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--dark2);
+      border-right: 1px solid rgba(255,152,0,0.15);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      z-index: 200;
+    }
+    .sidebar-header {
+      padding: 0;
+      border-bottom: 1px solid rgba(255,152,0,0.3);
+      background: var(--dark);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .sidebar-hero-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+    }
+    .sidebar-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.72) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px 20px 14px;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-decoration: none;
+      margin-bottom: 3px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    }
+    .sidebar-logo span { color: var(--green); }
+    .sidebar-tagline {
+      font-size: 10px;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .sidebar-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,152,0,0.2) transparent;
+    }
+    .sidebar-body::-webkit-scrollbar { width: 4px; }
+    .sidebar-body::-webkit-scrollbar-thumb { background: rgba(255,152,0,0.2); border-radius: 2px; }
+
+    /* sidebar sections */
+    .sb-section { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .sb-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 14px;
+    }
+
+    /* how it works steps */
+    .sb-steps { display: flex; flex-direction: column; gap: 12px; }
+    .sb-step { display: flex; gap: 12px; align-items: flex-start; }
+    .sb-step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,152,0,0.15);
+      border: 1px solid rgba(255,152,0,0.3);
+      color: var(--orange);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sb-step-content h4 { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+    .sb-step-content p { font-size: 12px; color: var(--grey); line-height: 1.5; }
+
+    /* why join */
+    .sb-benefits { display: flex; flex-direction: column; gap: 10px; }
+    .sb-benefit { display: flex; gap: 10px; align-items: flex-start; }
+    .sb-benefit-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .sb-benefit-text h4 { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+    .sb-benefit-text p { font-size: 12px; color: var(--grey); line-height: 1.5; }
+
+    /* partners */
+    .sb-partners {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-start;
+    }
+    .sb-partner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      width: 52px;
+    }
+    .sb-partner-circle {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.3px;
+      text-align: center;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+    .sb-partner-name {
+      font-size: 9px;
+      color: var(--grey);
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+
+    /* faq */
+    .sb-faq { display: flex; flex-direction: column; gap: 2px; }
+    .sb-faq-item { border-radius: 8px; overflow: hidden; }
+    .sb-faq-item.open { background: rgba(255,152,0,0.05); }
+    .sb-faq-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      text-align: left;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .sb-faq-btn:hover { background: rgba(255,255,255,0.04); }
+    .sb-faq-q {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.4;
+    }
+    .sb-faq-icon {
+      color: var(--orange);
+      font-size: 18px;
+      font-weight: 300;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+      line-height: 1;
+    }
+    .sb-faq-item.open .sb-faq-icon { transform: rotate(45deg); }
+    .sb-faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.2s;
+      padding: 0 12px;
+      font-size: 12px;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+    .sb-faq-item.open .sb-faq-answer { max-height: 300px; padding: 0 12px 10px; }
+
+    /* cta in sidebar */
+    .sb-cta {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,152,0,0.1), rgba(80,200,120,0.05));
+      border-top: 1px solid rgba(255,152,0,0.15);
+      flex-shrink: 0;
+    }
+    .sb-cta p { font-size: 12px; color: var(--grey); margin-bottom: 10px; line-height: 1.5; }
+    .sb-cta a {
+      display: block;
+      background: var(--orange);
+      color: var(--dark);
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+    .sb-cta a:hover { background: var(--green); }
+
+    /* ── APP AREA ── */
+    .app-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* top bar */
+    .app-topbar {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--dark);
+      border-bottom: 1px solid rgba(255,152,0,0.15);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .topbar-toggle {
+      background: none;
+      border: 1px solid rgba(255,152,0,0.3);
+      color: var(--orange);
+      width: 36px; height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .topbar-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--orange);
+    }
+    .topbar-logo span { color: var(--green); }
+
+    .app-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 32px rgba(0,0,0,0.6);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .app-topbar { display: flex; }
+      .app-area { width: 100%; }
+    }
+
+    /* ── OVERLAY (mobile) ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 150;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="hero.jpg" alt="Luxury home — your future with Mzansiway" class="sidebar-hero-img" />
+      <div class="sidebar-hero-overlay">
+        <div class="sidebar-logo">
+          Mzansi<span>way</span>
+        </div>
+        <div class="sidebar-tagline">My Landlord's Days Are Numbered</div>
+      </div>
+    </div>
+
+    <div class="sidebar-body">
+
+      <!-- HOW IT WORKS -->
+      <div class="sb-section">
+        <div class="sb-section-title">How It Works</div>
+        <div class="sb-steps">
+          <div class="sb-step">
+            <div class="sb-step-num">1</div>
+            <div class="sb-step-content">
+              <h4>Register Free</h4>
+              <p>Sign up with your SA ID and mobile number. No fees to join.</p>
+            </div>
+          </div>
+          <div class="sb-step">
+            <div class="sb-step-num">2</div>
+            <div class="sb-step-content">
+              <h4>Spend on Essentials</h4>
+              <p>Buy airtime, data, electricity and groceries through the app.</p>
+            </div>
+          </div>
+          <div class="sb-step">
+            <div class="sb-step-num">3</div>
+            <div class="sb-step-content">
+              <h4>Earn PV Points</h4>
+              <p>Every purchase earns Purchase Value points that move you up the housing queue.</p>
+            </div>
+          </div>
+          <div class="sb-step">
+            <div class="sb-step-num">4</div>
+            <div class="sb-step-content">
+              <h4>Get Your Home</h4>
+              <p>When your turn comes, Mzansiway allocates you a real property — no bond required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY JOIN -->
+      <div class="sb-section">
+        <div class="sb-section-title">Why Join</div>
+        <div class="sb-benefits">
+          <div class="sb-benefit">
+            <div class="sb-benefit-icon">🏠</div>
+            <div class="sb-benefit-text">
+              <h4>No Bond. No Deposit.</h4>
+              <p>Own a home without bank approval or credit checks.</p>
+            </div>
+          </div>
+          <div class="sb-benefit">
+            <div class="sb-benefit-icon">⚡</div>
+            <div class="sb-benefit-text">
+              <h4>Spend What You Already Spend</h4>
+              <p>Airtime, data, electricity and groceries — you buy these anyway.</p>
+            </div>
+          </div>
+          <div class="sb-benefit">
+            <div class="sb-benefit-icon">🎯</div>
+            <div class="sb-benefit-text">
+              <h4>Daily Competition</h4>
+              <p>Win cash prizes every weekday at 20:30 — just by being a member.</p>
+            </div>
+          </div>
+          <div class="sb-benefit">
+            <div class="sb-benefit-icon">👥</div>
+            <div class="sb-benefit-text">
+              <h4>Refer & Earn</h4>
+              <p>Earn commissions when people you refer make purchases.</p>
+            </div>
+          </div>
+          <div class="sb-benefit">
+            <div class="sb-benefit-icon">📜</div>
+            <div class="sb-benefit-text">
+              <h4>Title Deed Ownership</h4>
+              <p>You receive a real title deed — the property becomes legally yours.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POWERED BY -->
+      <div class="sb-section">
+        <div class="sb-section-title">Powered By</div>
+        <div class="sb-partners">
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#FFCB00; color:#000;">MTN</div>
+            <span class="sb-partner-name">MTN</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#E60000;">Voda<br>com</div>
+            <span class="sb-partner-name">Vodacom</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#333333;">Cell C</div>
+            <span class="sb-partner-name">Cell C</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#0066CC;">Tel<br>kom</div>
+            <span class="sb-partner-name">Telkom</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#003087;">Eskom</div>
+            <span class="sb-partner-name">Eskom</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#E31837;">Shop<br>rite</div>
+            <span class="sb-partner-name">Shoprite</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#00AEEF; color:#fff;">Check<br>ers</div>
+            <span class="sb-partner-name">Checkers</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#003087; font-size:8px;">Blue<br>Label</div>
+            <span class="sb-partner-name">Blue Label</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#004B87; font-size:8px;">Pay<br>Gate</div>
+            <span class="sb-partner-name">PayGate</span>
+          </div>
+          <div class="sb-partner">
+            <div class="sb-partner-circle" style="background:#009640;">Ned<br>bank</div>
+            <span class="sb-partner-name">Nedbank</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="sb-section">
+        <div class="sb-section-title">FAQ</div>
+        <div class="sb-faq">
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">Do I need a credit record?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">No credit check, no bank approval, no deposit needed. Your spending does the work.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">What are PV points?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Purchase Value points earned on every transaction. They determine your position in the housing queue. Different products earn different PV rates — airtime earns 3.25%, electricity between 0.31% and 2.09%.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">What housing tiers are there?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Four tiers: Bachelor (45 PV/month), 1-Bedroom (75 PV/month), 2-Bedroom (105 PV/month), and 3-Bedroom (135 PV/month). Consistent monthly spending keeps you in your tier.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">What are TDPs?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Title Deed Points — earned after property allocation. They track your progress toward receiving the legal title deed in your name.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">Is my money safe?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Yes. Card payments are processed by PayGate by Network (SSL3 encrypted). Your card details are never stored on Mzansiway's servers. Funds are held in a dedicated Nedbank account.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">What is Mzansinest?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Mzansinest is Mzansiway's business advertiser platform. Businesses advertise directly to Mzansiway members — and just like members earn toward a home, Mzansinest advertisers earn Allocation Points (AP) toward their own <strong>business premises</strong>. Mzansiway buys business offices for its advertisers.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">What is the Daily Competition?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">A live cash prize draw every weekday at 20:30. Funded by 10% of Mzansinest fees and 10% of member commissions. Winners also earn 0.5x PV on their prizes.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">Can I refer others?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Yes. Every member gets a referral code. You earn commissions from the purchases of people you refer, and those commissions also count toward your PV.</div>
+          </div>
+
+          <div class="sb-faq-item">
+            <button class="sb-faq-btn" onclick="toggleSbFaq(this)">
+              <span class="sb-faq-q">Who can join?</span>
+              <span class="sb-faq-icon">+</span>
+            </button>
+            <div class="sb-faq-answer">Any South African resident with a valid SA ID and mobile number. Mzansiway is available across all 9 provinces.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- REG INFO -->
+      <div class="sb-section" style="border-bottom:none;">
+        <div class="sb-section-title">About Mzansiway NPC</div>
+        <p style="font-size:12px; color:var(--grey); line-height:1.7;">
+          Mzansiway NPC is a registered South African Non-Profit Company.<br>
+          <strong style="color:rgba(255,255,255,0.4)">Reg: 2026/211861/08</strong><br><br>
+          <a href="mailto:admin@mzansiway.co.za" style="color:var(--orange); text-decoration:none;">admin@mzansiway.co.za</a>
+        </p>
+      </div>
+
+    </div><!-- end sidebar-body -->
+
+  </aside>
+
+  <!-- OVERLAY (mobile) -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- APP AREA -->
+  <div class="app-area">
+    <!-- mobile topbar -->
+    <div class="app-topbar">
+      <button class="topbar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-logo">Mzansi<span>way</span></div>
+    </div>
+
+    <!-- the actual app -->
+    <div class="app-area-content" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:40px;"><h2 style="font-family:Bebas Neue,sans-serif;font-size:2.5rem;color:#FF9800;letter-spacing:2px;">DOWNLOAD THE APP</h2><p style="color:#aaa;text-align:center;max-width:400px;">The Mzansiway app is available on iOS. Download it now to register, earn PV points and start your journey to homeownership.</p><a href="https://apps.apple.com/za/app/mzansiway/id1667536388" style="background:#FF9800;color:#000;font-weight:700;padding:16px 40px;border-radius:10px;text-decoration:none;font-size:1.1rem;letter-spacing:1px;">Download on App Store</a><p style="color:#555;font-size:0.8rem;">Android coming soon</p></div>
+  </div>
+
+</div>
+
+<script>
+  function toggleSidebar() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    sb.classList.toggle('open');
+    ov.classList.toggle('active');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('active');
+  }
+  function toggleSbFaq(btn) {
+    var item = btn.parentElement;
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.sb-faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+
+</body>
+</html>
