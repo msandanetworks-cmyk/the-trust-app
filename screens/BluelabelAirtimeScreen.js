@@ -2,6 +2,62 @@ import React, { useState } from 'react';
 import { StyleSheet, Image as RNImage, View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 import Notice from '../components/Notice';
 
+// Success message in member's home language
+// APPROVED MOTIVATIONAL MESSAGES — Mzansiway NPC
+// Source: Mzansiway_Multilingual_Payment_Messages_v4.pdf
+// Varies by language AND residence type (FREE / RENT / BOND)
+// OWN = no message shown
+const FREE_MESSAGES = {
+  'isiZulu':    'Ngizowuthola owami umuzi',
+  'isiXhosa':   'Ndizobanalo ikhaya lam',
+  'Afrikaans':  'Ek sal my eie huis kry.',
+  'English':    'I will get my own home.',
+  'Sepedi':     'Ke tla reka motse Waka',
+  'Setswana':   'Ke tla NNA le ntlo ya ka.',
+  'Sesotho':    'Ke haha waka motse.',
+  'Xitsonga':   'Nita xava ya mina yindlo',
+  'siSwati':    'Ngitawutfola likhaya lami',
+  'Tshivenda':  'Ndido wana nndu yanga.',
+  'isiNdebele': 'Ngizowuthola umuzi uthi mina no nofana wami',
+};
+const RENT_MESSAGES = {
+  'isiZulu':    'Ziyaphela izinsuku zikamastende',
+  'isiXhosa':   'Intsuku zika masandi zibaliwe',
+  'Afrikaans':  'Die verhuurder se dae is getel.',
+  'English':    "The landlord's days are numbered.",
+  'Sepedi':     'Matsatsi aka agoba le landlord a kgauswi le go fela.',
+  'Setswana':   'Matsatsi a go patela Landlord a Fela.',
+  'Sesotho':    "A ke satla ba le kamano efeng le Mong’antlo kapa ho ba mohiri.",
+  'Xitsonga':   'Masiku ya mastende ya hlayiwini',
+  'siSwati':    'Tinsuku temninidlu wendzawo tibaliwe',
+  'Tshivenda':  'Maduvha a vhahirisi o vhaliwa',
+  'isiNdebele': 'Kuyaphela ukuqatjha maduze',
+};
+const BOND_MESSAGES = {
+  'isiZulu':    'Sizophuma ebugqileni be bond',
+  'isiXhosa':   'Ndizaygqiba le-bond ngenye imini',
+  'Afrikaans':  'Ons sal ontsnap om die verband te betaal.',
+  'English':    'We will escape the bondage of the bond.',
+  'Sepedi':     'Re tla ikhutsa morwalo wa bond.',
+  'Setswana':   'Re tla tswa Mo kgatellong ya bond.',
+  'Sesotho':    'Ha ke sale lekhoba la kadimo ea ntlo.',
+  'Xitsonga':   'Hita hambana naku bohiwa hi bond',
+  'siSwati':    'Sitawuphunyuka ebugcilini sesibopho',
+  'Tshivenda':  'Ridobva vhupulini ha zwikolodo zwa haya.',
+  'isiNdebele': 'Sidlula ekubhadeleni abanye iinkolodo zabo',
+};
+function getSuccessMessage(homeLanguage, name, residenceType) {
+  if (!residenceType || residenceType === 'own' || residenceType === 'OWN') return null;
+  let messages;
+  if (residenceType === 'free' || residenceType === 'FREE') messages = FREE_MESSAGES;
+  else if (residenceType === 'rent' || residenceType === 'RENT' || residenceType === 'renting') messages = RENT_MESSAGES;
+  else if (residenceType === 'bond' || residenceType === 'BOND') messages = BOND_MESSAGES;
+  else messages = RENT_MESSAGES;
+  return messages[homeLanguage] || messages['English'];
+}
+
+
+
 const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
 const NETWORKS = [
@@ -13,7 +69,7 @@ const NETWORKS = [
 
 const AMOUNTS = [10, 20, 29, 50, 100, 200];
 
-export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
+export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
@@ -121,6 +177,20 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
           setPendingCard({ amount: amount, payRequestId: data.payRequestId });
           const { Linking } = require('react-native');
           Linking.openURL(data.redirectUrl);
+          let attempts = 0;
+          const poll = setInterval(async () => {
+            attempts++;
+            try {
+              const statusRes = await fetch(API_URL + '/api/paygate/status/' + data.payRequestId);
+              const statusData = await statusRes.json();
+              if (statusData.found && statusData.credited) {
+                clearInterval(poll);
+                await doAirtimePurchase(amount);
+                setPendingCard(null);
+              }
+            } catch (e) {}
+            if (attempts >= 40) clearInterval(poll);
+          }, 3000);
         } else {
           setNotice({ type: 'error', title: 'Payment Error', message: data.message || 'Could not start card payment. Please try wallet instead.' });
         }
@@ -173,6 +243,16 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
       </View>
     );
   };
+  const _lastScrollY = React.useRef(0);
+  const _handleScroll = React.useCallback(({ nativeEvent }) => {
+    const currentY = nativeEvent.contentOffset.y;
+    if (currentY > _lastScrollY.current + 5) {
+      onHideTabBar && onHideTabBar();
+    } else if (currentY < _lastScrollY.current - 5) {
+      onShowTabBar && onShowTabBar();
+    }
+    _lastScrollY.current = currentY;
+  }, [onHideTabBar, onShowTabBar]);
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
@@ -191,7 +271,7 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
       </View>
 
       {stage === 'entry' && (
-        <ScrollView style={styles.content}>
+        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <Text style={styles.label}>Select Network</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
             {NETWORKS.map(function(n) {
@@ -217,10 +297,10 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
                 <Pressable
                   key={a}
                   onPress={function() { setSelectedAmount(a); setCustomAmount(''); }}
-                  style={{ width: '30%', backgroundColor: isSelected ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: isSelected ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 10, padding: 14, alignItems: 'center' }}
+                  style={{ width: '30%', backgroundColor: isSelected ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: isSelected ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 10, padding: 14, alignItems: 'center', minWidth: 90 }}
                 >
                   <Text style={{ color: isSelected ? '#50C878' : t.text, fontSize: 18, fontWeight: 'bold' }}>R{a}</Text>
-                  <Text style={{ color: '#50C878', fontSize: 10, marginTop: 2 }}>+{(a * 0.015).toFixed(2)} PV</Text>
+                  <Text style={{ color: '#50C878', fontSize: 10, marginTop: 2 }}>+{(a * 0.015 * 0.70).toFixed(2)}</Text>
                 </Pressable>
               );
             })}
@@ -244,25 +324,26 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
               </Pressable>
             </View>
             <TextInput
-              style={[styles.phoneInput, { backgroundColor: t.bg, color: t.text, borderColor: t.darkMode ? '#0d2d50' : '#dddddd' }]}
+              style={[styles.phoneInput, { backgroundColor: t.bg, color: t.text, borderColor: sendToOther ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd') }]}
               placeholder="0812345678"
               placeholderTextColor={t.subText}
               keyboardType="phone-pad"
               maxLength={10}
               value={phoneNumber}
               onChangeText={setPhoneNumber}
-              editable={sendToOther}
+              editable={true}
+              autoFocus={false}
             />
           </View>
 
           <Text style={styles.label}>Pay With</Text>
-          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-            <Pressable onPress={function() { setPaymentMethod('wallet'); }} style={{ flex: 1, backgroundColor: paymentMethod === 'wallet' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'wallet' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 15 }}>
+            <Pressable onPress={function() { setPaymentMethod('wallet'); }} style={{ flex: 1, minWidth: 90, backgroundColor: paymentMethod === 'wallet' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'wallet' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center', minWidth: 90 }}>
               <Text style={{ fontSize: 22, marginBottom: 4 }}>👛</Text>
               <Text style={{ color: paymentMethod === 'wallet' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Wallet</Text>
               <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Balance: R{userData.cashWallet.toFixed(2)}</Text>
             </Pressable>
-            <Pressable onPress={function() { setPaymentMethod('card'); }} style={{ flex: 1, backgroundColor: paymentMethod === 'card' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'card' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Pressable onPress={function() { setPaymentMethod('card'); }} style={{ flex: 1, minWidth: 90, backgroundColor: paymentMethod === 'card' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'card' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center', minWidth: 90 }}>
               <Text style={{ fontSize: 22, marginBottom: 4 }}>💳</Text>
               <Text style={{ color: paymentMethod === 'card' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Card</Text>
               <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Secure PayGate</Text>
@@ -271,7 +352,7 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
                 onPress={function() { setPaymentMethod('gratitude'); }}
                 style={{
                   flex: 1,
-                  minWidth: '45%',
+                  minWidth: 90,
                   backgroundColor: paymentMethod === 'gratitude' ? (t.darkMode ? '#1A0F00' : '#fff8e8') : (t.darkMode ? '#082040' : '#ffffff'),
                   borderWidth: 2,
                   borderColor: paymentMethod === 'gratitude' ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd'),
@@ -304,7 +385,7 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
       )}
 
       {stage === 'success' && purchaseResult && (
-        <ScrollView style={styles.content}>
+        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>📱</Text>
             <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, (purchaseResult.network || '') + ' Airtime')}</Text>
@@ -322,10 +403,17 @@ export default function BluelabelAirtimeScreen({ userData, onBack, theme }) {
                 <Text style={[styles.receiptLabel, { color: t.text }]}>Amount</Text>
                 <Text style={styles.receiptValueOrange}>R{purchaseResult.amount.toFixed(2)}</Text>
               </View>
-              <View style={styles.receiptRow}>
-                <Text style={[styles.receiptLabel, { color: t.text }]}>PV Earned</Text>
-                <Text style={styles.receiptValueGreen}>+{(purchaseResult.pvEarned || 0).toFixed(2)} PV</Text>
-              </View>
+              {userData && userData.creditType?.toLowerCase() !== 'health' ? (
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Home Credits</Text>
+                  <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
+                </View>
+              ) : (
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Health Credits</Text>
+                  <Text style={[styles.receiptValueGreen, { color: '#FF9800' }]}>+{((purchaseResult.pvEarned || 0) * 0.30).toFixed(2)}</Text>
+                </View>
+              )}
               <View style={styles.receiptRow}>
                 <Text style={[styles.receiptLabel, { color: t.text }]}>New Wallet Balance</Text>
                 <Text style={styles.receiptValueOrange}>R{(purchaseResult.newBalance || 0).toFixed(2)}</Text>
@@ -392,3 +480,4 @@ const styles = StyleSheet.create({
   receiptValueSmall: { fontSize: 10, color: '#888', fontFamily: 'monospace', flex: 1, textAlign: 'right' },
   bottomSpace: { height: 40 },
 });
+
