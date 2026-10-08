@@ -62,7 +62,7 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
         contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <TouchableOpacity style={styles.modeToggle} onPress={t.toggle}>
-          <Text style={styles.modeToggleText}>{t.darkMode ? 'â˜€ï¸' : 'ðŸŒ™'}</Text>
+          <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🔑'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>ðŸŽ¯ Referral Program</Text>
         <Text style={styles.subtitle}>Earn commission on all referral purchases</Text>
@@ -112,15 +112,15 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
 
       <View style={[styles.infoCard, { backgroundColor: t.darkMode ? '#1A2F1A' : '#e8fff0' }]}>
         <Text style={styles.infoTitle}>ðŸ† How It Works</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>â€¢ Share your cell number or QR code</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>â€¢ Friend registers using your number</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>â€¢ When they purchase, you earn commission</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>â€¢ Commission goes to your Cash Wallet</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>â€¢ Spend Cash Wallet to earn PV points!</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• Share your cell number or QR code</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• Friend registers using your number</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• When they purchase, you earn commission</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• Commission goes to your Cash Wallet</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• Spend Cash Wallet to earn PV points!</Text>
       </View>
 
       <View style={[styles.exampleCard, { backgroundColor: t.card2 }]}>
-        <Text style={styles.exampleTitle}>ðŸ’° Example Earnings</Text>
+        <Text style={styles.exampleTitle}>💰 Example Earnings</Text>
         <View style={[styles.exampleRow, { borderBottomColor: t.darkMode ? '#0d2d50' : '#dddddd' }]}>
           <Text style={[styles.exampleText, { color: t.subText }]}>Referral buys R1000 groceries</Text>
           <Text style={styles.exampleAmount}>You earn commission</Text>

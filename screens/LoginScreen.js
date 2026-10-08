@@ -83,7 +83,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
           const bindData = await bindResponse.json();
 
           if (!bindData.success && bindData.deviceBlocked && phoneNumber !== '0800000001') {
-            // Different device â€” block login
+            // Different device — block login
             setNotice({
               type: 'error',
               title: 'ðŸ”’ Device Not Recognised',
@@ -94,7 +94,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
           }
         } catch (deviceErr) {
           // If device check fails, allow login (don't block on network error)
-          console.log('[Device] Binding check failed â€” allowing login:', deviceErr.message);
+          console.log('[Device] Binding check failed — allowing login:', deviceErr.message);
         }
 
         onLoginSuccess(data.user);
@@ -118,7 +118,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
       </View>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <TouchableOpacity style={styles.modeToggle} onPress={t.toggle}>
-          <Text style={styles.modeToggleText}>{t.darkMode ? 'â˜€ï¸' : 'ðŸŒ™'}</Text>
+          <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🔑'}</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color: "#FF9800" }]}>Mzansiway</Text>
         <Text style={[styles.subtitle, { color: t.text }]}>Shop. Earn Benefits. Own your house.</Text>
@@ -147,7 +147,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
             onChangeText={setPassword}
           />
           <TouchableOpacity style={styles.eyeButton} onPress={function() { setShowPassword(!showPassword); }}>
-            <Text style={styles.eyeText}>{showPassword ? 'ðŸ‘ï¸' : 'ðŸ™ˆ'}</Text>
+            <Text style={styles.eyeText}>{showPassword ? '👁️ï¸' : 'ðŸ™ˆ'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -156,7 +156,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
         </Pressable>
 
         <Pressable onPress={onBack} style={styles.backBtn}>
-          <Text style={{ color: '#FF9800', fontSize: 16, fontWeight: 'bold' }}>â† Back</Text>
+          <Text style={{ color: '#FF9800', fontSize: 16, fontWeight: 'bold' }}>← Back</Text>
         </Pressable>
       </View>
 

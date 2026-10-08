@@ -20,7 +20,11 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: t.bg }]}
+      style={[styles.container
+      {/* SA Suburb Watermark */}
+      <View style={{position:"absolute",top:0,left:0,right:0,bottom:0,overflow:"hidden",zIndex:0,opacity:0.04,pointerEvents:"none"}}>
+        {["Sandton","Soweto","Randburg","Midrand","Centurion","Roodepoort","Benoni","Boksburg","Germiston","Krugersdorp","Alberton","Springs","Kempton Park","Edenvale","Fourways","Bryanston","Rosebank","Melrose","Parktown","Alexandra","Diepsloot","Tembisa","Katlehong","Vosloorus","Lenasia","Eldorado Park","Dobsonville","Meadowlands","Pimville","Morningside","Illovo","Hyde Park","Houghton","Northcliff","Honeydew","Cosmo City","Naturena","Ennerdale","Protea Glen","Orange Farm"].map((s,i)=>(<Text key={i} style={{position:"absolute",top:(i%13)*52+10,left:(i%3)*110+8,fontSize:11,fontWeight:"600",color:"#006400",transform:[{rotate:i%2===0?"-8deg":"4deg"}]}}>{s}</Text>))}
+      </View>, { backgroundColor: t.bg }]}
       contentContainerStyle={styles.content}
       onScroll={_handleScroll} scrollEventThrottle={16}>
 
@@ -30,7 +34,7 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
         style={styles.hero}
       >
         <TouchableOpacity style={styles.themeToggle} onPress={t.toggle}>
-          <Text style={styles.themeToggleIcon}>{t.darkMode ? 'â˜€ï¸' : 'ðŸŒ™'}</Text>
+          <Text style={styles.themeToggleIcon}>{t.darkMode ? '☀️' : '🌙'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => onLogin('home')}>
@@ -41,39 +45,9 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
         </TouchableOpacity>
 
         <Text style={styles.sub}>
-          Shop. Earn Benefits. Own. Turn your everyday spending into real Home Benefits â€” toward a home of your own.
+          Shop. Earn Benefits. Own your home.
         </Text>
       </LinearGradient>
-
-      {/* Goal Section â€” Home Benefits only */}
-      <View style={styles.goalSection}>
-        <Text style={[styles.goalTitle, { color: t.darkMode ? '#fff' : '#003865' }]}>
-          Home Benefits
-        </Text>
-        <Text style={[styles.goalSubtitle, { color: t.subText }]}>
-          
-        </Text>
-
-        <View style={styles.goalRow}>
-          <TouchableOpacity
-            style={[
-              styles.goalCard,
-              {
-                borderColor: '#50C878',
-                backgroundColor: t.darkMode ? '#0F2F1F' : '#e8fff0',
-                width: '100%',
-              }
-            ]}
-            onPress={() => onRegister('home')}
-          >
-            <Text style={styles.goalIcon}>ðŸ </Text>
-            <Text style={[styles.goalCardTitle, { color: '#50C878' }]}>Home Benefits</Text>
-            <Text style={[styles.goalCardDesc, { color: t.subText }]}>
-              Shop through Mzansiway, earn Home Points, and move toward owning your own home.
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Action Buttons */}
       <View style={styles.btnContainer}>
@@ -93,9 +67,9 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
 
       {/* Footer */}
       <View style={[styles.footer, { borderTopColor: t.darkMode ? '#0d2d50' : '#dddddd' }]}>
-        <Text style={[styles.footerReg, { color: '#888' }]}>Mzansiway NPC Â· Reg: 2026/211861/08</Text>
-        <Text style={[styles.footerReg, { color: '#888' }]}>The South African Way ðŸ‡¿ðŸ‡¦</Text>
-        <Text style={[styles.footerContact, { color: '#888' }]}>admin@mzansiway.co.za Â· mzansiway.co.za</Text>
+        <Text style={[styles.footerReg, { color: '#888' }]}>Mzansiway NPC · Reg: 2026/211861/08</Text>
+        <Text style={[styles.footerReg, { color: '#888' }]}>The South African Way 🇿🇦</Text>
+        <Text style={[styles.footerContact, { color: '#888' }]}>admin@mzansiway.co.za · mzansiway.co.za</Text>
       </View>
 
       <Text style={{ textAlign: 'center', color: '#999', fontSize: 11, marginTop: 8, marginBottom: 4, paddingHorizontal: 16 }}>
