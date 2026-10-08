@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Svg, { Circle } from 'react-native-svg';
 import { StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
+import Svg, { Path, Rect, Circle } from 'react-native-svg';
 
 const PROVINCE_COLORS = {
   'Eastern Cape': '#50C878',
   'Free State': '#FF9800',
-  'Gauteng': '#003865',
+  'Gauteng': '#002147',
   'KwaZulu-Natal': '#2E7D32',
   'Limpopo': '#F57C00',
   'Mpumalanga': '#1565C0',
@@ -13,6 +13,8 @@ const PROVINCE_COLORS = {
   'Northern Cape': '#D84315',
   'Western Cape': '#00838F'
 };
+
+const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
 export default function DashboardScreen({ userData, onNavigate, onLogout, theme }) {
   const [stats, setStats] = useState(null);
@@ -28,13 +30,13 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
   const memberStatusIcon = userData.propertyAllocated ? '🔑' : '🏠';
   const memberStatusColor = userData.propertyAllocated ? '#FF9800' : '#50C878';
   const memberStatusInfo = userData.propertyAllocated
-    ? 'You have been allocated a property and are in the queue for your Title Deed. Keep accumulating TDPs to progress toward full ownership.'
-    : 'You are in the queue for your property. Keep spending to earn PVs and move up the queue.';
+    ? 'You have been allocated a property and are in the queue for your Title Deed. Keep accumulating Home Points to progress toward full ownership.'
+    : 'You are in the queue for your property. Keep spending to earn Home Points and move up the queue.';
 
   const t = theme || {
-    bg: '#003865',
-    card: '#0a2545',
-    card2: '#082040',
+    bg: '#121212',
+    card: '#1A1A1A',
+    card2: '#1E1E1E',
     text: '#ffffff',
     subText: '#aaaaaa',
     darkMode: true,
@@ -42,16 +44,14 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
   };
 
   useEffect(() => {
-    fetch('https://mzansiway-backend-production.up.railway.app/api/tiers')
+    fetch(`${API_URL}/api/tiers`)
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        if (data.success) {
-          setTiers(data.tiers);
-        }
+        if (data.success) { setTiers(data.tiers); }
       })
       .catch(function(e) { console.log('Tiers load error'); });
 
-    fetch('https://mzansiway-backend-production.up.railway.app/api/stats/provinces')
+    fetch(`${API_URL}/api/stats/provinces`)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         setStats(data);
@@ -59,21 +59,21 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
       })
       .catch(function(e) { console.log('Stats load error'); });
 
-    fetch('https://mzansiway-backend-production.up.railway.app/api/tdp/' + userData.memberNumber)
+    fetch(`${API_URL}/api/tdp/` + userData.memberNumber)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.success) { setTdpData(data); }
       })
       .catch(function(e) { console.log('TDP load error'); });
 
-    fetch('https://mzansiway-backend-production.up.railway.app/api/notifications/' + userData.memberNumber)
+    fetch(`${API_URL}/api/notifications/` + userData.memberNumber)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.success) { setUnreadCount(data.unreadCount); }
       })
       .catch(function(e) { console.log('Notifications load error'); });
 
-    fetch('https://mzansiway-backend-production.up.railway.app/api/campaign/current')
+    fetch(`${API_URL}/api/campaign/current`)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.success) { setCampaign(data.campaign); setNextInQueue(data.nextInQueue); }
@@ -98,22 +98,21 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
   const circumference = 2 * Math.PI * radius;
   let accumulated = 0;
 
-  const totalCredits = (userData.houseCredits || 0) + (userData.healthCredits || 0);
-  const circumference2 = 2 * Math.PI * 80;
-  const donutSegments = totalCredits > 0 ? [
-    {
-      color: '#50C878',
-      dash: ((userData.houseCredits || 0) / totalCredits) * circumference,
-      gap: circumference - ((userData.houseCredits || 0) / totalCredits) * circumference,
-      rotation: -90
-    },
-    {
-      color: '#FF9800',
-      dash: ((userData.healthCredits || 0) / totalCredits) * circumference,
-      gap: circumference - ((userData.healthCredits || 0) / totalCredits) * circumference,
-      rotation: ((userData.houseCredits || 0) / totalCredits) * 360 - 90
-    }
-  ] : [];
+  const donutSegments = provincesWithMembers.length > 0 ? provincesWithMembers.map(function(p, i) {
+    const fraction = p.count / totalMembers;
+    const dash = fraction * circumference;
+    const gap = circumference - dash;
+    const rotation = (accumulated / totalMembers) * 360 - 90;
+    accumulated = accumulated + p.count;
+    return {
+      province: p.province,
+      count: p.count,
+      color: PROVINCE_COLORS[p.province] || '#888',
+      dash: dash,
+      gap: gap,
+      rotation: rotation
+    };
+  }) : [];
 
   const tdpProgress = tdpData && tdpData.progress ? tdpData.progress : {};
   const nearestTier = tdpProgress.bachelor < 100
@@ -129,8 +128,19 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
+
+      <View style={{margin:16,borderRadius:20,padding:20,backgroundColor:"#003865",elevation:8}}>
+        <Text style={{color:"rgba(255,255,255,0.6)",fontSize:12,textTransform:"uppercase"}}>My Wallet</Text>
+        <Text style={{color:"#fff",fontSize:32,fontWeight:"700"}}>R{(userData.cashWallet||0).toFixed(2)}</Text>
+      </View>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <View style={styles.headerLeft}>
+          <Svg width="40" height="40" viewBox="0 0 400 400">
+            <Path d="M 200 40 L 320 90 L 320 230 Q 320 290 200 360 Q 80 290 80 230 L 80 90 Z" fill="#002147" />
+            <Path d="M 200 60 L 300 100 L 300 225 Q 300 275 200 335 Q 100 275 100 225 L 100 100 Z" fill="#50C878" />
+            <Path d="M 100 100 L 200 60 L 300 100 L 280 115 L 200 85 L 120 115 Z" fill="#002147" />
+            <Rect x="185" y="260" width="30" height="40" fill="#002147" />
+          </Svg>
           <View style={styles.headerText}>
             <Text style={[styles.greeting, { color: t.text }]}>Welcome back,</Text>
             <Text style={styles.name}>{userData.name}</Text>
@@ -169,7 +179,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
       </View>
 
       <ScrollView style={styles.content}>
-        <View style={[styles.heroCard, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
+        <View style={[styles.heroCard, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#002147' : '#a0c4ff' }]}>
           <Text style={styles.heroTitle}>Mzansiway Overview</Text>
 
           <View style={[styles.titleDeedsRow, { backgroundColor: t.darkMode ? '#1a3a2a' : '#e8fff0', borderColor: '#50C878' }]}>
@@ -186,7 +196,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
 
           <View style={styles.donutWrapper}>
             <Svg width="220" height="220" viewBox="0 0 220 220">
-              <Circle cx="110" cy="110" r="80" fill="none" stroke={t.darkMode ? '#082040' : '#dddddd'} strokeWidth="24" />
+              <Circle cx="110" cy="110" r="80" fill="none" stroke={t.darkMode ? '#1E1E1E' : '#dddddd'} strokeWidth="24" />
               {donutSegments.map(function(seg, i) {
                 return (
                   <Circle key={i} cx="110" cy="110" r="80" fill="none" stroke={seg.color} strokeWidth="24"
@@ -197,9 +207,9 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
               })}
             </Svg>
             <View style={styles.donutCenter}>
-              <Text style={[styles.donutAuctionLabel, { color: t.text }]}>My Credits</Text>
-              <Text style={styles.donutAuctionValue}>R{((userData.houseCredits || 0) + (userData.healthCredits || 0)).toFixed(0)}</Text>
-              <Text style={[styles.donutMembers, { color: '#FF9800' }]}>HC: R{(userData.healthCredits || 0).toFixed(0)} | HC: R{(userData.houseCredits || 0).toFixed(0)}</Text>
+              <Text style={[styles.donutAuctionLabel, { color: t.text }]}>Title Deed Fund</Text>
+              <Text style={styles.donutAuctionValue}>R{auctionFund.toFixed(0)}</Text>
+              <Text style={styles.donutMembers}>{totalMembers} {totalMembers === 1 ? 'Member' : 'Members'}</Text>
             </View>
           </View>
 
@@ -209,7 +219,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
               <Text style={[styles.campaignMember, { color: t.text }]}>
                 Raising for: <Text style={styles.campaignHighlight}>{campaign.memberName}'s {campaign.tierName} unit</Text>
               </Text>
-              <View style={[styles.auctionBar, { backgroundColor: t.darkMode ? '#082040' : '#dddddd', marginTop: 8 }]}>
+              <View style={[styles.auctionBar, { backgroundColor: t.darkMode ? '#1E1E1E' : '#dddddd', marginTop: 8 }]}>
                 <View style={[styles.auctionBarFill, { width: Math.min(parseFloat(campaign.progress), 100) + '%' }]} />
               </View>
               <Text style={[styles.auctionTargetText, { color: t.text }]}>
@@ -221,7 +231,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
             </View>
           ) : (
             <View>
-              <View style={[styles.auctionBar, { backgroundColor: t.darkMode ? '#082040' : '#dddddd' }]}>
+              <View style={[styles.auctionBar, { backgroundColor: t.darkMode ? '#1E1E1E' : '#dddddd' }]}>
                 <View style={[styles.auctionBarFill, { width: Math.min(auctionProgress, 100) + '%' }]} />
               </View>
               <Text style={[styles.auctionTargetText, { color: t.text }]}>R{auctionFund.toFixed(0)} of R{auctionTarget.toLocaleString()} target ({auctionProgress.toFixed(2)}%)</Text>
@@ -231,7 +241,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
         </View>
 
         {provincesWithMembers.length > 0 && (
-          <View style={[styles.legendCard, { backgroundColor: t.card2, borderColor: t.darkMode ? '#0d2d50' : '#dddddd' }]}>
+          <View style={[styles.legendCard, { backgroundColor: t.card2, borderColor: t.darkMode ? '#2A2A2A' : '#dddddd' }]}>
             <Text style={styles.legendTitle}>Members by Province</Text>
             {provincesWithMembers.map(function(p, i) {
               const percent = ((p.count / totalMembers) * 100).toFixed(0);
@@ -265,7 +275,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
               <Text style={[styles.tdpMessage, { color: t.text }]}>
                 You have earned {tdpBalance.toFixed(2)} TDPs. You are {(100 - parseFloat(nearestTier.progressPercent)).toFixed(2)}% away from your {nearestTier.tierName} title deed. Keep pushing! 💪
               </Text>
-              <View style={[styles.tdpBarContainer, { backgroundColor: t.darkMode ? '#082040' : '#dddddd' }]}>
+              <View style={[styles.tdpBarContainer, { backgroundColor: t.darkMode ? '#1E1E1E' : '#dddddd' }]}>
                 <View style={[styles.tdpBarFill, { width: Math.min(parseFloat(nearestTier.progressPercent), 100) + '%' }]} />
               </View>
               <Text style={styles.tdpBarLabel}>{parseFloat(nearestTier.progressPercent).toFixed(2)}% toward {nearestTier.tierName}</Text>
@@ -283,12 +293,12 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
             <View style={styles.tiersHeader}>
               <Text style={styles.tiersTitle}>House Tier Qualification</Text>
             </View>
-            <Text style={[styles.tiersCurrent, { color: t.text }]}>You this month: {userData.currentMonthPV.toFixed(2)} PV</Text>
+            <Text style={[styles.tiersCurrent, { color: t.text }]}>You this month: {userData.currentMonthPV.toFixed(2)} Home Points</Text>
             {tiers.map(function(tier) {
               const qualifies = userData.currentMonthPV >= tier.minPV;
               const needed = tier.minPV - userData.currentMonthPV;
               return (
-                <View key={tier.id} style={[styles.tierRow, qualifies && styles.tierRowQualified, { borderBottomColor: t.darkMode ? '#0d2d50' : '#dddddd' }]}>
+                <View key={tier.id} style={[styles.tierRow, qualifies && styles.tierRowQualified, { borderBottomColor: t.darkMode ? '#2A2A2A' : '#dddddd' }]}>
                   <View style={styles.tierLeft}>
                     <Text style={[styles.tierCheck, qualifies ? styles.tierCheckYes : styles.tierCheckNo]}>{qualifies ? '✓' : '○'}</Text>
                     <View style={styles.tierInfo}>
@@ -296,7 +306,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
                     </View>
                   </View>
                   <View style={styles.tierRight}>
-                    <Text style={qualifies ? styles.tierPVQualified : [styles.tierPV, { color: t.text }]}>{tier.minPV} PV</Text>
+                    <Text style={qualifies ? styles.tierPVQualified : [styles.tierPV, { color: t.text }]}>{tier.minPV} pts</Text>
                     {!qualifies && needed > 0 && (
                       <Text style={styles.tierNeeded}>Need {needed.toFixed(0)} more</Text>
                     )}
@@ -312,9 +322,9 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
 
         <View style={styles.statsRow}>
           <View style={[styles.statCardGreen, { backgroundColor: t.darkMode ? '#1A2F1A' : '#e8fff0' }]}>
-            <Text style={[styles.statLabel, { color: t.text }]}>Your House Credits (HC)</Text>
-            <Text style={styles.statValueGreen}>{(userData.houseCredits || userData.points || 0).toFixed(2)}</Text>
-            <View style={[styles.progressBarSmall, { backgroundColor: t.darkMode ? '#003865' : '#dddddd' }]}>
+            <Text style={[styles.statLabel, { color: t.text }]}>Home Points</Text>
+            <Text style={styles.statValueGreen}>{userData.points.toFixed(2)}</Text>
+            <View style={[styles.progressBarSmall, { backgroundColor: t.darkMode ? '#121212' : '#dddddd' }]}>
               <View style={[styles.progressFillGreen, { width: Math.min(pvProgress, 100) + '%' }]} />
             </View>
             <Text style={styles.statSubtext}>{userData.currentMonthPV.toFixed(2)} / {userData.monthlyTarget} this month</Text>
@@ -326,7 +336,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
           </View>
         </View>
 
-         <View style={[styles.walletCard, { backgroundColor: t.card2, borderColor: '#50C878' }]}>
+        <View style={[styles.walletCard, { backgroundColor: t.card2, borderColor: '#50C878' }]}>
           <Text style={styles.walletLabel}>Wallet Balance</Text>
           <Text style={styles.walletValue}>R{userData.cashWallet.toFixed(2)}</Text>
           <Pressable style={styles.topUpBtn} onPress={function() { onNavigate('topup'); }}>
@@ -334,21 +344,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
           </Pressable>
         </View>
 
-        <View style={[styles.walletCard, { backgroundColor: t.card2, borderColor: '#50C878' }]}>
-          <Text style={styles.walletLabel}>💚 Gratitude Wallet</Text>
-          <Text style={styles.walletValue}>R{(userData.gratitudeWallet || 0).toFixed(2)}</Text>
-          <Pressable style={[styles.topUpBtn, { backgroundColor: '#50C878' }]} onPress={function() { onNavigate('gratitude-wallet'); }}>
-            <Text style={styles.topUpBtnText}>View & Spend</Text>
-          </Pressable>
-        </View>
-        <View style={[styles.walletCard, { backgroundColor: t.card2, borderColor: '#FF9800' }]}>
-          <Text style={styles.walletLabel}>🏆 Competition Wallet</Text>
-          <Text style={styles.walletValue}>R{(userData.competitionWallet || 0).toFixed(2)}</Text>
-          <Pressable style={[styles.topUpBtn, { backgroundColor: '#FF9800' }]} onPress={function() { onNavigate('competition-wallet'); }}>
-            <Text style={styles.topUpBtnText}>View & Spend</Text>
-          </Pressable>
-        </View>
-        <View style={[styles.referralCard, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
+        <View style={[styles.referralCard, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#002147' : '#a0c4ff' }]}>
           <Text style={styles.referralLabel}>Your Referrals</Text>
           <Text style={[styles.referralValue, { color: t.text }]}>{userData.totalReferrals} Members</Text>
           <Text style={[styles.referralCodeLabel, { color: t.subText }]}>Share your referral code with friends:</Text>
@@ -356,16 +352,16 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
         </View>
 
         <View style={styles.quickActions}>
-          <Text style={[styles.quickTitle, { color: t.darkMode ? '#50C878' : '#003865' }]}>Quick Actions</Text>
-          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#0d2d50' : '#dddddd' }]} onPress={function() { onNavigate('store'); }}>
+          <Text style={[styles.quickTitle, { color: t.darkMode ? '#50C878' : '#111111' }]}>Quick Actions</Text>
+          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#2A2A2A' : '#dddddd' }]} onPress={function() { onNavigate('store'); }}>
             <Text style={styles.actionIcon}>🛒</Text>
-            <Text style={[styles.actionText, { color: t.text }]}>Shop and Earn Credits</Text>
+            <Text style={[styles.actionText, { color: t.text }]}>Shop and Earn Home Points</Text>
           </Pressable>
-          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#0d2d50' : '#dddddd' }]} onPress={function() { onNavigate('titledeedpoints'); }}>
+          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#2A2A2A' : '#dddddd' }]} onPress={function() { onNavigate('titledeedpoints'); }}>
             <Text style={styles.actionIcon}>🏠</Text>
-            <Text style={[styles.actionText, { color: t.text }]}>My House Credits</Text>
+            <Text style={[styles.actionText, { color: t.text }]}>My Title Deed Points</Text>
           </Pressable>
-          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#0d2d50' : '#dddddd' }]} onPress={function() { onNavigate('2fa-setup'); }}>
+          <Pressable style={[styles.actionBtn, { backgroundColor: t.card2, borderColor: t.darkMode ? '#2A2A2A' : '#dddddd' }]} onPress={function() { onNavigate('2fa-setup'); }}>
             <Text style={styles.actionIcon}>🔐</Text>
             <Text style={[styles.actionText, { color: t.text }]}>Enable 2FA Security</Text>
           </Pressable>
@@ -399,7 +395,7 @@ const styles = StyleSheet.create({
   bellBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   modeToggle: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,152,0,0.15)', alignItems: 'center', justifyContent: 'center' },
   modeToggleText: { fontSize: 18 },
-  logoutBtn: { backgroundColor: '#003865', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
+  logoutBtn: { backgroundColor: '#002147', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
   logoutText: { fontSize: 13, color: '#FFFFFF', fontWeight: 'bold' },
   content: { flex: 1, padding: 15 },
   heroCard: { padding: 20, borderRadius: 16, marginBottom: 15, alignItems: 'center', borderWidth: 2 },
@@ -445,7 +441,7 @@ const styles = StyleSheet.create({
   tdpBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 15 },
   statCardGreen: { flex: 1, padding: 15, borderRadius: 12, borderWidth: 2, borderColor: '#50C878' },
-  statCardBlue: { flex: 1, padding: 15, borderRadius: 12, borderWidth: 2, borderColor: '#003865' },
+  statCardBlue: { flex: 1, padding: 15, borderRadius: 12, borderWidth: 2, borderColor: '#002147' },
   statLabel: { fontSize: 11, marginBottom: 4 },
   statValueGreen: { fontSize: 26, color: '#50C878', fontWeight: 'bold' },
   statValueBlue: { fontSize: 26, fontWeight: 'bold' },

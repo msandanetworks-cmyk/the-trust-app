@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import Notice from '../components/Notice';
 
@@ -83,10 +83,10 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
           const bindData = await bindResponse.json();
 
           if (!bindData.success && bindData.deviceBlocked && phoneNumber !== '0800000001') {
-            // Different device — block login
+            // Different device â€” block login
             setNotice({
               type: 'error',
-              title: '🔒 Device Not Recognised',
+              title: 'ðŸ”’ Device Not Recognised',
               message: 'This account is active on another device. Contact Mzansiway support at admin@mzansiway.co.za to transfer your account.'
             });
             setLoading(false);
@@ -94,7 +94,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
           }
         } catch (deviceErr) {
           // If device check fails, allow login (don't block on network error)
-          console.log('[Device] Binding check failed — allowing login:', deviceErr.message);
+          console.log('[Device] Binding check failed â€” allowing login:', deviceErr.message);
         }
 
         onLoginSuccess(data.user);
@@ -111,14 +111,17 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
   return (
     <ScrollView style={[styles.container, { backgroundColor: t.bg }]}
         contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
+
+      {/* SA Suburb Watermark */}
+      <View style={{position:"absolute",top:0,left:0,right:0,bottom:0,overflow:"hidden",zIndex:0,opacity:0.06}} pointerEvents="none">
+        {["Sandton","Soweto","Randburg","Midrand","Centurion","Roodepoort","Benoni","Boksburg","Germiston","Krugersdorp","Alberton","Springs","Kempton Park","Edenvale","Fourways","Bryanston","Rosebank","Melrose","Parktown","Alexandra","Diepsloot","Tembisa","Katlehong","Vosloorus","Lenasia","Eldorado Park","Dobsonville","Meadowlands","Pimville","Morningside","Illovo","Hyde Park","Houghton","Northcliff","Honeydew","Cosmo City","Naturena","Ennerdale","Protea Glen","Orange Farm"].map((s,i)=>(<Text key={i} style={{position:"absolute",top:(i%13)*52+10,left:(i%3)*110+8,fontSize:11,fontWeight:"600",color:"#006400",transform:[{rotate:i%2===0?"-8deg":"4deg"}]}}>{s}</Text>))}
+      </View>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <TouchableOpacity style={styles.modeToggle} onPress={t.toggle}>
-          <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🌙'}</Text>
+          <Text style={styles.modeToggleText}>{t.darkMode ? 'â˜€ï¸' : 'ðŸŒ™'}</Text>
         </TouchableOpacity>
-        <View style={styles.logoRow}>
-          <Text style={[styles.title, { color: '#FF9800' }]}>Login</Text>
-        </View>
-        <Text style={[styles.subtitle, { color: t.text }]}>Welcome back to Mzansiway</Text>
+        <Text style={[styles.title, { color: "#FF9800" }]}>Mzansiway</Text>
+        <Text style={[styles.subtitle, { color: t.text }]}>Shop. Earn Benefits. Own your house.</Text>
       </View>
 
       <View style={styles.content}>
@@ -144,7 +147,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
             onChangeText={setPassword}
           />
           <TouchableOpacity style={styles.eyeButton} onPress={function() { setShowPassword(!showPassword); }}>
-            <Text style={styles.eyeText}>{showPassword ? '👁️' : '🙈'}</Text>
+            <Text style={styles.eyeText}>{showPassword ? 'ðŸ‘ï¸' : 'ðŸ™ˆ'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -153,7 +156,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
         </Pressable>
 
         <Pressable onPress={onBack} style={styles.backBtn}>
-          <Text style={{ color: '#FF9800', fontSize: 16, fontWeight: 'bold' }}>← Back</Text>
+          <Text style={{ color: '#FF9800', fontSize: 16, fontWeight: 'bold' }}>â† Back</Text>
         </Pressable>
       </View>
 
@@ -164,7 +167,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, alignItems: 'center' },
+  header: { paddingTop: 60, paddingBottom: 40, paddingHorizontal: 20, alignItems: 'center', minHeight: 220, justifyContent: 'center' },
   modeToggle: {
     position: 'absolute', top: 16, right: 16, zIndex: 100,
     width: 40, height: 40, borderRadius: 20,
@@ -172,9 +175,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   modeToggleText: { fontSize: 20 },
-  logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginLeft: 12, letterSpacing: 2 },
-  subtitle: { fontSize: 13, textAlign: 'center', marginTop: 6 },
+  logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  title: { fontSize: 36, fontWeight: 'bold', textAlign: 'center', marginLeft: 0, letterSpacing: 3 },
+  subtitle: { fontSize: 14, textAlign: 'center', marginTop: 10, letterSpacing: 0.5, opacity: 0.85, paddingHorizontal: 20 },
   content: { padding: 20 },
   label: { fontSize: 14, color: '#FF9800', marginBottom: 8, fontWeight: 'bold', marginTop: 15 },
   input: { padding: 16, borderRadius: 12, fontSize: 18, borderWidth: 2, marginBottom: 15 },
@@ -186,3 +189,4 @@ const styles = StyleSheet.create({
   submitBtnText: { color: '#ffffff', fontSize: 18, fontWeight: 'bold' },
   backBtn: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#FF9800', padding: 14, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
 });
+
