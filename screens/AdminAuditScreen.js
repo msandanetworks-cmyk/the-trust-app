@@ -515,6 +515,63 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
           )}
         </View>
 
+        
+        {/* -- POOL RESERVE STATUS -- */}
+        <View style={[s.section, { backgroundColor: card }]}>
+          <Text style={[s.sectionTitle, { color: ORANGE }]}>⚡ Pool Reserve Status</Text>
+          {reserveLoading ? (
+            <ActivityIndicator color={ORANGE} style={{ marginVertical: 12 }} />
+          ) : reserve ? (() => {
+            const healthy = reserve.healthy;
+            const statusColor = healthy ? GREEN : RED;
+            const pct = reserve.reserveRequired > 0
+              ? Math.min(100, Math.round((reserve.poolBalance / reserve.reserveRequired) * 100))
+              : 100;
+            return (
+              <>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                  <View style={{
+                    width: 14, height: 14, borderRadius: 7,
+                    backgroundColor: statusColor, marginRight: 8,
+                  }} />
+                  <Text style={{ color: statusColor, fontWeight: '700', fontSize: 15 }}>
+                    {healthy ? 'HEALTHY' : 'UNDERFUNDED'}
+                  </Text>
+                </View>
+                {[
+                  ['Pool Balance (Auction Fund)', reserve.poolBalance],
+                  ['Total Member Wallets',        reserve.totalWallets],
+                  ['Reserve Required (1.5x)',     reserve.reserveRequired],
+                  [healthy ? 'Surplus' : 'Shortfall', Math.abs(reserve.shortfall)],
+                ].map(([label, val]) => (
+                  <View key={label} style={[s.row, { borderBottomColor: card2 }]}>
+                    <Text style={[s.rowL, { color: sub }]}>{label}</Text>
+                    <Text style={[s.rowV, { color: label.includes('Shortfall') ? RED : label.includes('Surplus') ? GREEN : text }]}>
+                      {'R' + Number(val || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                ))}
+                <View style={{ marginTop: 12 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <Text style={{ color: sub, fontSize: 11 }}>Reserve coverage</Text>
+                    <Text style={{ color: statusColor, fontSize: 11, fontWeight: '700' }}>{pct}%</Text>
+                  </View>
+                  <View style={[s.barBg, { backgroundColor: card2 }]}>
+                    <View style={[s.barFill, { backgroundColor: statusColor, width: pct + '%' }]} />
+                  </View>
+                  <Text style={{ color: sub, fontSize: 10, marginTop: 4 }}>
+                    {healthy
+                      ? 'Pool covers member wallets at ' + pct + '% (minimum 150%)'
+                      : 'Pool is below the 150% minimum - top up needed'}
+                  </Text>
+                </View>
+              </>
+            );
+          })() : (
+            <Text style={[s.noData, { color: sub }]}>Reserve data unavailable</Text>
+          )}
+        </View>
+
         {/* ── MEMBER SEARCH ── */}
         <View style={[s.section, { backgroundColor: card }]}>
           <Text style={[s.sectionTitle, { color: ORANGE }]}>👤 Member Search</Text>
