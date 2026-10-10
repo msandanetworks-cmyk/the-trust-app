@@ -312,6 +312,10 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
   const [funds, setFunds]         = useState(null);
   const [fundsLoading, setFL]     = useState(true);
 
+  // -- Reserve status state --
+  const [reserve, setReserve]       = useState(null);
+  const [reserveLoading, setRL]     = useState(true);
+
   // ── Member search state ──
   const [phone, setPhone]         = useState('');
   const [result, setResult]       = useState(null);
@@ -339,6 +343,7 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
   // ── Load global funds on mount ──
   useEffect(() => {
     fetchFunds();
+    fetchReserve();
   }, []);
 
   async function fetchFunds() {
@@ -354,6 +359,21 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
       setFunds(null);
     } finally {
       setFL(false);
+    }
+  }
+
+  async function fetchReserve() {
+    setRL(true);
+    try {
+      const resp = await fetch(BACKEND + '/api/admin/reserve-status');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      setReserve(data);
+    } catch (err) {
+      console.log('[Audit] Reserve load error:', err.message);
+      setReserve(null);
+    } finally {
+      setRL(false);
     }
   }
 
