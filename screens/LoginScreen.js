@@ -111,17 +111,12 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
   return (
     <ScrollView style={[styles.container, { backgroundColor: t.bg }]}
         contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
-
-      {/* SA Suburb Watermark */}
-      <View style={{position:"absolute",top:0,left:0,right:0,bottom:0,overflow:"hidden",zIndex:0,opacity:0.06}} pointerEvents="none">
-        {["Sandton","Soweto","Randburg","Midrand","Centurion","Roodepoort","Benoni","Boksburg","Germiston","Krugersdorp","Alberton","Springs","Kempton Park","Edenvale","Fourways","Bryanston","Rosebank","Melrose","Parktown","Alexandra","Diepsloot","Tembisa","Katlehong","Vosloorus","Lenasia","Eldorado Park","Dobsonville","Meadowlands","Pimville","Morningside","Illovo","Hyde Park","Houghton","Northcliff","Honeydew","Cosmo City","Naturena","Ennerdale","Protea Glen","Orange Farm"].map((s,i)=>(<Text key={i} style={{position:"absolute",top:(i%13)*52+10,left:(i%3)*110+8,fontSize:11,fontWeight:"600",color:"#006400",transform:[{rotate:i%2===0?"-8deg":"4deg"}]}}>{s}</Text>))}
-      </View>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <TouchableOpacity style={styles.modeToggle} onPress={t.toggle}>
           <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🔑'}</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color: "#FF9800" }]}>Mzansiway</Text>
-        <Text style={[styles.subtitle, { color: t.text }]}>Shop. Earn Benefits. Own your house.</Text>
+        <Text style={[styles.subtitle, { color: t.text }]}>Shop. Earn Home Points. Own your home.</Text>
       </View>
 
       <View style={styles.content}>
@@ -147,7 +142,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
             onChangeText={setPassword}
           />
           <TouchableOpacity style={styles.eyeButton} onPress={function() { setShowPassword(!showPassword); }}>
-            <Text style={styles.eyeText}>{showPassword ? '👁️ï¸' : 'ðŸ™ˆ'}</Text>
+            <Text style={styles.eyeText}>{showPassword ? 'Hide' : 'Show'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -161,7 +156,9 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
       </View>
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
-    </ScrollView>
+      
+      
+      </ScrollView>
   );
 }
 
