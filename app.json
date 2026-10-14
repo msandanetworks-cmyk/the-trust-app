@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Mzansiway",
+    "slug": "mzansiway",
+    "scheme": "mzansiway",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/mzansiway_app_icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#003865"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.mzansiway.app",
+      "buildNumber": "26",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "icon": "./assets/mzansiway_app_icon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/mzansiway_adaptive_fg.png",
+        "backgroundColor": "#003865"
+      },
+      "package": "com.mzansiway.app",
+      "versionCode": 23
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9cfed585-b6d4-4376-a014-cf3c231a16dd"
+      }
+    },
+    "plugins": [
+      "./plugins/withR8Config",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/mzansiway_app_icon.png",
+          "color": "#003865",
+          "sounds": []
+        }
+      ]
+    ]
+  }
+}
