@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Pressable, ScrollView, AsyncStorage } from 'react-native';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import * as Notifications from 'expo-notifications';
+import AsyncStorageLib from '@react-native-async-storage/async-storage';
+
+const MUTE_KEY = 'mzansiway_payment_sound_muted';
 
 const MESSAGES = {
   FREE: {
@@ -40,7 +43,7 @@ const MESSAGES = {
     Setswana: 'Re tla tswa Mo kgatellong ya bond.',
     Sesotho: 'Ha ke sale lekhoba la kadimo ea ntlo.',
     Xitsonga: 'Hita hambana naku bohiwa hi bond',
-    siSwati: 'Sitawuphunyuka ebugcilini besibopho',
+    siSwati: 'Sitawuphunyuka ebugcilini sesibopho',
     Tshivenda: 'Ridobva vhupulini ha zwikolodo zwa haya.',
     isiNdebele: 'Sidlula ekubhadeleni abanye iinkolodo zabo',
   },
@@ -78,7 +81,7 @@ async function showSuccessNotification(amount, productType) {
         body: `R${amount ? amount.toFixed(2) : '0.00'} paid for ${productType || 'transaction'}. Thank you for using Mzansiway!`,
         sound: true,
       },
-      trigger: null, // fire immediately
+      trigger: null,
     });
   } catch (e) {
     // Notification is best-effort
@@ -87,6 +90,8 @@ async function showSuccessNotification(amount, productType) {
 
 export default function PaymentSuccessScreen({ amount, productType, newBalance, pvEarned, onClose, homeLanguage, residenceType, onHideTabBar, onShowTabBar }) {
   const _lastScrollY = React.useRef(0);
+  const [muted, setMuted] = useState(false);
+
   const _handleScroll = React.useCallback(({ nativeEvent }) => {
     const currentY = nativeEvent.contentOffset.y;
     if (currentY > _lastScrollY.current + 5) {
@@ -98,15 +103,40 @@ export default function PaymentSuccessScreen({ amount, productType, newBalance, 
   }, [onHideTabBar, onShowTabBar]);
 
   useEffect(() => {
-    playSuccessSound();
-    showSuccessNotification(amount, productType);
+    // Load mute preference
+    AsyncStorageLib.getItem(MUTE_KEY).then(val => {
+      const isMuted = val === 'true';
+      setMuted(isMuted);
+      if (!isMuted) {
+        playSuccessSound();
+        showSuccessNotification(amount, productType);
+      }
+    }).catch(() => {
+      // If storage fails, play anyway
+      playSuccessSound();
+      showSuccessNotification(amount, productType);
+    });
   }, []);
+
+  const toggleMute = async () => {
+    const newMuted = !muted;
+    setMuted(newMuted);
+    try {
+      await AsyncStorageLib.setItem(MUTE_KEY, String(newMuted));
+    } catch (e) {}
+  };
 
   const message = getMotivationalMessage(homeLanguage, residenceType);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
       <View style={styles.content}>
+
+        {/* Mute toggle top-right */}
+        <Pressable style={styles.muteButton} onPress={toggleMute}>
+          <Text style={styles.muteIcon}>{muted ? '🔕' : '🔔'}</Text>
+        </Pressable>
+
         <View style={styles.iconCircle}>
           <Text style={styles.icon}>✅</Text>
         </View>
@@ -147,16 +177,17 @@ export default function PaymentSuccessScreen({ amount, productType, newBalance, 
         <Pressable style={styles.closeButton} onPress={onClose}>
           <Text style={styles.closeButtonText}>Done</Text>
         </Pressable>
-      </View>
 
-      
-      </ScrollView>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#003865', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   content: { padding: 30, alignItems: 'center', paddingTop: 60 },
+  muteButton: { position: 'absolute', top: 16, right: 16, padding: 8, zIndex: 10 },
+  muteIcon: { fontSize: 24 },
   iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#1A2F1A', justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 3, borderColor: '#50C878' },
   icon: { fontSize: 56 },
   title: { fontSize: 28, color: '#50C878', fontWeight: 'bold', marginBottom: 8, textAlign: 'center' },
