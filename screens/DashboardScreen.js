@@ -128,11 +128,6 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
-
-      <View style={{margin:16,borderRadius:20,padding:20,backgroundColor:"#003865",elevation:8}}>
-        <Text style={{color:"rgba(255,255,255,0.6)",fontSize:12,textTransform:"uppercase"}}>My Wallet</Text>
-        <Text style={{color:"#fff",fontSize:32,fontWeight:"700"}}>R{(userData.cashWallet||0).toFixed(2)}</Text>
-      </View>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <View style={styles.headerLeft}>
           <Svg width="40" height="40" viewBox="0 0 400 400">
@@ -368,7 +363,20 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
         </View>
 
         <View style={styles.bottomSpace} />
-      </ScrollView>
+      
+      
+      
+
+        {/* ── Mzansiway SIM — Coming Soon ── */}
+        <View style={styles.simComingSoonTile}>
+          <View style={styles.simComingSoonBadge}>
+            <Text style={styles.simComingSoonBadgeText}>COMING SOON</Text>
+          </View>
+          <Text style={styles.simComingSoonIcon}>📱</Text>
+          <Text style={styles.simComingSoonTitle}>Mzansiway SIM</Text>
+          <Text style={styles.simComingSoonSub}>Free data with every purchase</Text>
+        </View>
+</ScrollView>
     </View>
   );
 }
@@ -463,7 +471,7 @@ const styles = StyleSheet.create({
   actionBtn: { padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginBottom: 10, borderWidth: 1 },
   actionIcon: { fontSize: 24, marginRight: 12 },
   actionText: { fontSize: 14, fontWeight: 'bold' },
-  bottomSpace: { height: 40 },
+  bottomSpace: { height: 100 },
   tiersCard: { padding: 16, borderRadius: 12, marginBottom: 15, borderWidth: 2 },
   tiersHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   tiersTitle: { fontSize: 14, color: '#50C878', fontWeight: 'bold' },
@@ -486,4 +494,33 @@ const styles = StyleSheet.create({
   campaignMember: { fontSize: 14, marginBottom: 4 },
   campaignHighlight: { color: '#FF9800', fontWeight: 'bold' },
   campaignNext: { fontSize: 11, marginTop: 6, fontStyle: 'italic' },
+
+  simComingSoonTile: {
+    backgroundColor: '#0A1628',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#1a3060',
+    borderStyle: 'dashed',
+    padding: 20,
+    alignItems: 'center',
+    opacity: 0.75,
+    marginTop: 12,
+    width: '100%',
+  },
+  simComingSoonBadge: {
+    backgroundColor: '#FF9800',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginBottom: 10,
+  },
+  simComingSoonBadgeText: {
+    color: '#003865',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+  },
+  simComingSoonIcon: { fontSize: 36, marginBottom: 8 },
+  simComingSoonTitle: { fontSize: 16, color: '#FFFFFF', fontWeight: 'bold' },
+  simComingSoonSub: { fontSize: 12, color: '#888', marginTop: 4, textAlign: 'center' },
 });
