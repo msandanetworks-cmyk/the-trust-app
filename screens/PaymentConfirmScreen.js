@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
 
+async function playSuccessSound() {
+  // removed: expo-av and expo-haptics no longer available
+}
+
 export default function PaymentConfirmScreen({ amount, walletBalance, productType, pvEarned, userName, onConfirm, onCancel, userData }) {
   const newBalance = walletBalance - amount;
   const [password, setPassword] = useState('');
@@ -143,3 +147,4 @@ const styles = StyleSheet.create({
   cancelText: { color: '#888', fontSize: 15, textAlign: 'center' },
   securityNote: { fontSize: 11, color: '#666', textAlign: 'center', fontStyle: 'italic' },
 });
+
