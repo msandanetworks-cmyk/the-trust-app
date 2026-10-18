@@ -436,7 +436,7 @@ const ComingSoonScreen = ({ title, message, onBack }) => (
   </View>
 );
 
-const ComingSoonScreen = ({ title, message, onBack }) => {
+) => {
   const { View, Text, TouchableOpacity } = require('react-native');
   return (
     <View style={{ flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 60 }}>
