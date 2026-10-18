@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,6 +9,30 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WebView } from 'react-native-webview';
+
+const SUCCESS_SOUND_HTML = `
+<!DOCTYPE html><html><body style="margin:0;background:transparent;">
+<script>
+  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+  function beep(freq, start, dur, vol) {
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = freq;
+    o.type = 'sine';
+    g.gain.setValueAtTime(0, ctx.currentTime + start);
+    g.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.01);
+    g.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+    o.start(ctx.currentTime + start);
+    o.stop(ctx.currentTime + start + dur + 0.05);
+  }
+  beep(523, 0.0, 0.15, 0.4);
+  beep(659, 0.15, 0.15, 0.4);
+  beep(784, 0.3, 0.25, 0.5);
+</script>
+</body></html>
+`;
 
 export default function PaymentSuccessScreen({ route, navigation }) {
   const {
@@ -22,8 +46,10 @@ export default function PaymentSuccessScreen({ route, navigation }) {
 
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [playSound, setPlaySound] = useState(false);
 
   useEffect(() => {
+    setPlaySound(true);
     Animated.sequence([
       Animated.spring(scaleAnim, {
         toValue: 1,
@@ -62,6 +88,15 @@ export default function PaymentSuccessScreen({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container} bounces={false}>
+      {playSound && (
+        <WebView
+          source={{ html: SUCCESS_SOUND_HTML }}
+          style={{ width: 0, height: 0, position: 'absolute' }}
+          mediaPlaybackRequiresUserAction={false}
+          allowsInlineMediaPlayback={true}
+          onLoad={() => setTimeout(() => setPlaySound(false), 1000)}
+        />
+      )}
       <View style={styles.successCard}>
         <Animated.View
           style={[styles.checkCircle, { transform: [{ scale: scaleAnim }] }]}
