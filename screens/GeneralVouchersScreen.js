@@ -982,7 +982,6 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
   if (stage === 'success' && purchaseResult) {
     return (
       <View style={[styles.container, { backgroundColor: t.bg }]}>
-        {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
         <View style={[styles.header, { backgroundColor: t.card }]}>
           <Text style={styles.title}>✅ Purchase Complete</Text>
         </View>
@@ -1246,6 +1245,7 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
       </ScrollView>
 
       <Notice notice={notice} onClose={() => setNotice(null)} />
+      {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
     </View>
   );
 }

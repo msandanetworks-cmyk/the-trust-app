@@ -10,23 +10,22 @@ const NOTIFICATION_ICONS = {
 };
 
 const SUCCESS_SOUND_HTML = `<!DOCTYPE html><html><body><script>
-var ctx = new (window.AudioContext || window.webkitAudioContext)();
-function playNote(freq, start, dur) {
-  var o = ctx.createOscillator();
-  var g = ctx.createGain();
-  o.connect(g); g.connect(ctx.destination);
-  o.frequency.value = freq;
-  o.type = 'sine';
-  g.gain.setValueAtTime(0, ctx.currentTime + start);
-  g.gain.linearRampToValueAtTime(0.8, ctx.currentTime + start + 0.05);
-  g.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
-  o.start(ctx.currentTime + start);
-  o.stop(ctx.currentTime + start + dur + 0.05);
-}
-playNote(523.25, 0, 0.15);
-playNote(659.25, 0.18, 0.15);
-playNote(783.99, 0.36, 0.3);
-<\/script></body></html>`;
+window.onload=function(){
+  var a=new AudioContext();
+  function beep(f,t,v){
+    var o=a.createOscillator();
+    var g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.frequency.value=f;o.type='square';
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(1.0,t+0.01);
+    g.gain.linearRampToValueAtTime(0,t+0.18);
+    o.start(t);o.stop(t+0.2);
+  }
+  var n=a.currentTime;
+  beep(880,n);beep(1109,n+0.2);beep(1318,n+0.4);
+};
+</script></body></html>`
 
 export default function NotificationScreen({ userData, onBack, onNavigate, theme, onHideTabBar, onShowTabBar }) {
   const _lastScrollY = useRef(0);
