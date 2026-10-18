@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, View, Text, TouchableOpacity, Animated, Platform } from 'react-native';
 
@@ -364,30 +364,30 @@ function AppInner() {
        currentScreen !== 'admin' &&
        currentScreen !== 'accountant-login' &&
        currentScreen !== 'accountant-dashboard' && (
-        <Animated.View style={[styles.tabBar, { backgroundColor: theme.tabBg, borderTopColor: theme.tabBorder, transform: [{ translateY: tabBarAnim }], paddingBottom: insets.bottom + 10 }]}>
+        <Animated.View style={[styles.tabBar, { backgroundColor: theme.tabBg, borderTopColor: theme.tabBorder, transform: [{ translateY: tabBarAnim }], paddingBottom: Math.max(insets.bottom, 16) }]}>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('dashboard')}>
-            <Text style={styles.tabIcon}>🏠</Text>
+            <Text style={styles.tabIcon}>ðŸ </Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Home</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('topup')}>
-            <Text style={styles.tabIcon}>💳</Text>
+            <Text style={styles.tabIcon}>ðŸ’³</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Top Up</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('store')}>
-            <Text style={styles.tabIcon}>🛒</Text>
+            <Text style={styles.tabIcon}>ðŸ›’</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Store</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('referral')}>
-            <Text style={styles.tabIcon}>👥</Text>
+            <Text style={styles.tabIcon}>ðŸ‘¥</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Referrals</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('propertyregister')}>
-            <Text style={styles.tabIcon}>🏘️</Text>
+            <Text style={styles.tabIcon}>ðŸ˜ï¸</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Properties</Text>
           </TouchableOpacity>
           {userData && userData.isAdmin && (
             <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('audit')}>
-              <Text style={styles.tabIcon}>🔍</Text>
+              <Text style={styles.tabIcon}>ðŸ”</Text>
               <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Audit</Text>
             </TouchableOpacity>
           )}
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100,
-    overflow: 'visible', flexDirection: 'row', borderTopWidth: 2, paddingBottom: 10, paddingTop: 10 },
+    overflow: 'visible', flexDirection: 'row', borderTopWidth: 2, paddingTop: 10 },
   tabItem: { flex: 1, alignItems: 'center', paddingVertical: 8 },
   tabIcon: { fontSize: 24, marginBottom: 4 },
   tabLabel: { fontSize: 11, fontWeight: '600' },
@@ -419,3 +419,4 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+
