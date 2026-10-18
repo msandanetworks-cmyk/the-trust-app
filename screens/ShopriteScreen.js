@@ -463,9 +463,9 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
       )}
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
-    </View>
       {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
     </>
+    </View>
   );
 }
 
