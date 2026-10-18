@@ -74,7 +74,8 @@ const AMOUNTS = [10, 20, 29, 50, 100, 200];
 
 export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [selectedNetwork, setSelectedNetwork] = useState(null);
-  const [selectedAmount, setSelectedAmount] = useState(null);
+
+  const [showSound, setShowSound] = useState(false);  const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [sendToOther, setSendToOther] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber || '');

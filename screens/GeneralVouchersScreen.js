@@ -802,7 +802,8 @@ const SECTIONS = [
 
 export default function GeneralVouchersScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [activeSection, setActiveSection] = useState('airtime');
-  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const [showSound, setShowSound] = useState(false);  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('wallet');

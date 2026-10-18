@@ -69,7 +69,8 @@ const ELECTRICITY_AMOUNTS = [
 
 export default function ElectricityScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [meterNumber, setMeterNumber] = useState('000000000100');
-  const [selectedAmount, setSelectedAmount] = useState(null);
+
+  const [showSound, setShowSound] = useState(false);  const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [stage, setStage] = useState('entry');
   const [paymentMethod, setPaymentMethod] = useState('card');

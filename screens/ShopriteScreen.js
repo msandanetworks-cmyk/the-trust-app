@@ -60,7 +60,8 @@ const AMOUNTS = [50, 100, 250, 500, 1000, 2000];
 
 export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [selectedAmount, setSelectedAmount] = useState(null);
-  const [customAmount, setCustomAmount] = useState('');
+
+  const [showSound, setShowSound] = useState(false);  const [customAmount, setCustomAmount] = useState('');
   const [sendToOther, setSendToOther] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber || '');
   const [stage, setStage] = useState('entry');
