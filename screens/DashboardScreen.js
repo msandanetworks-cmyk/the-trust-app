@@ -362,21 +362,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
           </Pressable>
         </View>
 
-        <View style={styles.bottomSpace} />
-      
-      
-      
-
-        {/* ── Mzansiway SIM — Coming Soon ── */}
-        <View style={styles.simComingSoonTile}>
-          <View style={styles.simComingSoonBadge}>
-            <Text style={styles.simComingSoonBadgeText}>COMING SOON</Text>
-          </View>
-          <Text style={styles.simComingSoonIcon}>📱</Text>
-          <Text style={styles.simComingSoonTitle}>Mzansiway SIM</Text>
-          <Text style={styles.simComingSoonSub}>Free data with every purchase</Text>
-        </View>
-</ScrollView>
+        <View style={styles.bottomSpace} /></ScrollView>
     </View>
   );
 }
@@ -524,3 +510,4 @@ const styles = StyleSheet.create({
   simComingSoonTitle: { fontSize: 16, color: '#FFFFFF', fontWeight: 'bold' },
   simComingSoonSub: { fontSize: 12, color: '#888', marginTop: 4, textAlign: 'center' },
 });
+
