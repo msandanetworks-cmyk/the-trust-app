@@ -324,6 +324,16 @@ function AppInner() {
         />
       )}
 
+
+      {currentScreen === 'mzansiway-sim' && (
+        <ComingSoonScreen
+          title="Mzansiway SIM"
+          message="Our own SIM card is coming soon! Buy data and airtime while earning Housing Points."
+          onBack={() => setCurrentScreen('store')}
+        />
+      )}
+
+
       {currentScreen === 'lifestyle-vouchers' && userData && (
         <LifestyleVouchersScreen
           route={{ params: { memberNumber: userData.memberNumber, walletBalance: userData.cashWallet } }}
@@ -412,6 +422,35 @@ const styles = StyleSheet.create({
   tabLabel: { fontSize: 11, fontWeight: '600' },
 });
 
+
+const ComingSoonScreen = ({ title, message, onBack }) => (
+  <View style={{ flex: 1, backgroundColor: '#ffffff', padding: 24, paddingTop: 60 }}>
+    <TouchableOpacity onPress={onBack} style={{ marginBottom: 24 }}>
+      <Text style={{ color: '#2e7d32', fontSize: 16 }}>← Back</Text>
+    </TouchableOpacity>
+    <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#1a1a1a', marginBottom: 12 }}>📱 {title}</Text>
+    <View style={{ backgroundColor: '#e8f5e9', borderRadius: 12, padding: 20, marginTop: 16 }}>
+      <Text style={{ fontSize: 16, color: '#2e7d32', fontWeight: 'bold', marginBottom: 8 }}>Coming Soon</Text>
+      <Text style={{ fontSize: 14, color: '#444444', lineHeight: 22 }}>{message}</Text>
+    </View>
+  </View>
+);
+
+const ComingSoonScreen = ({ title, message, onBack }) => {
+  const { View, Text, TouchableOpacity } = require('react-native');
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 60 }}>
+      <TouchableOpacity onPress={onBack} style={{ marginBottom: 24 }}>
+        <Text style={{ color: '#2e7d32', fontSize: 16 }}>← Back</Text>
+      </TouchableOpacity>
+      <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#1a1a1a', marginBottom: 16 }}>📱 {title}</Text>
+      <View style={{ backgroundColor: '#e8f5e9', borderRadius: 12, padding: 20, marginTop: 20 }}>
+        <Text style={{ fontSize: 16, color: '#2e7d32', fontWeight: 'bold', marginBottom: 8 }}>Coming Soon</Text>
+        <Text style={{ fontSize: 14, color: '#555', lineHeight: 22 }}>{message}</Text>
+      </View>
+    </View>
+  );
+};
 export default function App() {
   return (
     <SafeAreaProvider>
