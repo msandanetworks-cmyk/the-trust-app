@@ -447,7 +447,7 @@ export default function ElectricityScreen({userData, onBack, theme, onHideTabBar
 
       {stage === 'success' && purchaseResult && (
         <>
-        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute'}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
+        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:1,height:1,position:'absolute',top:-100,left:-100,opacity:0}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>⚡</Text>

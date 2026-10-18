@@ -981,7 +981,7 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
   if (stage === 'success' && purchaseResult) {
     return (
       <View style={[styles.container, { backgroundColor: t.bg }]}>
-        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute'}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
+        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:1,height:1,position:'absolute',top:-100,left:-100,opacity:0}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
         <View style={[styles.header, { backgroundColor: t.card }]}>
           <Text style={styles.title}>✅ Purchase Complete</Text>
         </View>
