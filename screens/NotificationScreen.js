@@ -1,12 +1,12 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
 const NOTIFICATION_ICONS = {
-  airtime: '📱', data: '📶', electricity: '⚡', shoprite: '🛒',
-  lifestyle: '🎫', draw: '🎯', system: '🔔', allocation: '🏠'
+  airtime: '📱', data: '📡', electricity: '⚡', shoprite: '🛒',
+  lifestyle: '🎁', draw: '🏆', system: '🔔', allocation: '🏠'
 };
 
 const SUCCESS_SOUND_HTML = `<!DOCTYPE html><html><body><script>
@@ -18,7 +18,7 @@ function playNote(freq, start, dur) {
   o.frequency.value = freq;
   o.type = 'sine';
   g.gain.setValueAtTime(0, ctx.currentTime + start);
-  g.gain.linearRampToValueAtTime(0.3, ctx.currentTime + start + 0.05);
+  g.gain.linearRampToValueAtTime(0.8, ctx.currentTime + start + 0.05);
   g.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
   o.start(ctx.currentTime + start);
   o.stop(ctx.currentTime + start + dur + 0.05);
@@ -84,10 +84,10 @@ export default function NotificationScreen({ userData, onBack, onNavigate, theme
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
-      {playSound && (
+      {playSound && Platform.OS !== 'web' && (
         <WebView
           source={{ html: SUCCESS_SOUND_HTML }}
-          style={{ width: 0, height: 0, position: 'absolute' }}
+          style={{ width: 1, height: 1, position: 'absolute', top: -100, left: -100, opacity: 0 }}
           javaScriptEnabled={true}
           mediaPlaybackRequiresUserAction={false}
           allowsInlineMediaPlayback={true}
@@ -105,7 +105,7 @@ export default function NotificationScreen({ userData, onBack, onNavigate, theme
           <Text style={[styles.emptyText, { color: t.subText }]}>Loading...</Text>
         ) : notifications.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🔕</Text>
+            <Text style={styles.emptyIcon}>🔔</Text>
             <Text style={[styles.emptyText, { color: t.subText }]}>No notifications yet.</Text>
             <Text style={[styles.emptySubText, { color: t.subText }]}>Your transaction updates will appear here.</Text>
           </View>
@@ -165,3 +165,4 @@ const styles = StyleSheet.create({
   notifTime: { fontSize: 11 },
   notifTapHint: { color: '#FF9800', fontSize: 12, fontWeight: 'bold', marginTop: 6 },
 });
+
