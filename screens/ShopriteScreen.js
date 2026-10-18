@@ -3,7 +3,7 @@ import { WebView } from 'react-native-webview';
 import { StyleSheet, View, Text, ScrollView, TextInput, Pressable, Image, Linking } from 'react-native';
 import Notice from '../components/Notice';
 
-const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(0.8,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
+const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
 
 const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
@@ -231,7 +231,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
           gratitudeWallet: data.gratitudeWallet
         });
         if (data.newBalance !== undefined) userData.cashWallet = data.newBalance;
-        setStage('success');
+        setStage('success'); setShowSound(true);
       } else {
         let title = 'Voucher Unavailable';
         let message = data.message || "We couldn't process this voucher right now. Please try again later or contact support.";
@@ -408,7 +408,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
 
       {stage === 'success' && purchaseResult && (
         <>
-        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:1,height:1,position:'absolute',top:-100,left:-100,opacity:0}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
+        {showSound && Platform.OS !== 'web' && {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}}
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 120 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>🛒</Text>

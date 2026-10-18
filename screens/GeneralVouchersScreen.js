@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { StyleSheet, Platform, View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import Notice from '../components/Notice';
 
-const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(0.8,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
+const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
 
 const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
@@ -881,7 +881,7 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
             newBalance: data.newWalletBalance,
             pvEarned: data.pvEarned,
           });
-          setStage('success');
+          setStage('success'); setShowSound(true);
         } else {
           setNotice({ type: 'error', title: 'Purchase Failed', message: data.error || data.message || 'Could not complete purchase. Please try again.' });
         }
@@ -981,7 +981,7 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
   if (stage === 'success' && purchaseResult) {
     return (
       <View style={[styles.container, { backgroundColor: t.bg }]}>
-        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:1,height:1,position:'absolute',top:-100,left:-100,opacity:0}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
+        {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
         <View style={[styles.header, { backgroundColor: t.card }]}>
           <Text style={styles.title}>✅ Purchase Complete</Text>
         </View>

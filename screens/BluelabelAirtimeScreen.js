@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, Image as RNImage, View, Text, ScrollView, TextInput, Pressable } from 'react-native';
+import { StyleSheet, Platform, Image as RNImage, View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 import Notice from '../components/Notice';
 
-const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(0.8,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
+const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
 
 // Success message in member's home language
 // APPROVED MOTIVATIONAL MESSAGES — Mzansiway NPC
@@ -134,7 +134,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           newBalance: data.newBalance,
           pvEarned: data.pvEarned
         });
-        setStage('success');
+        setStage('success'); setShowSound(true);
             } else if (data.poolDepleted) {
         setNotice({ type: 'error', title: 'System Error', message: "Don't panic! Your money is safe in your wallet. Please retry this transaction in 30 minutes." });
       } else {
@@ -389,7 +389,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
 
       {stage === 'success' && purchaseResult && (
         <>
-        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:1,height:1,position:'absolute',top:-100,left:-100,opacity:0}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
+        {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>📱</Text>
