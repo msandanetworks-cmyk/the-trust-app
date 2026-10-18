@@ -259,6 +259,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
   }, [onHideTabBar, onShowTabBar]);
 
   return (
+    <>
     <View style={[styles.container, { backgroundColor: t.bg }]}>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <Pressable style={styles.backBtn} onPress={onBack}>
@@ -444,6 +445,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
     </View>
       {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
+    </>
   );
 }
 
