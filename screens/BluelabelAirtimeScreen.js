@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { WebView } from 'react-native-webview';
 import { StyleSheet, Image as RNImage, View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 import Notice from '../components/Notice';
+
+const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(0.8,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
 
 // Success message in member's home language
 // APPROVED MOTIVATIONAL MESSAGES — Mzansiway NPC
@@ -382,9 +385,12 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           </Pressable>
           <View style={styles.bottomSpace} />
         </ScrollView>
+        </>
       )}
 
       {stage === 'success' && purchaseResult && (
+        <>
+        <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute'}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} />
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>📱</Text>
@@ -405,7 +411,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
               </View>
               {userData && userData.creditType?.toLowerCase() !== 'health' ? (
                 <View style={styles.receiptRow}>
-                  <Text style={[styles.receiptLabel, { color: t.text }]}>Home Credits</Text>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Home Points</Text>
                   <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
                 </View>
               ) : (
@@ -430,7 +436,10 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
             <Text style={styles.primaryBtnText}>Done</Text>
           </Pressable>
           <View style={styles.bottomSpace} />
-        </ScrollView>
+
+      
+      </ScrollView>
+        </>
       )}
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
@@ -480,4 +489,7 @@ const styles = StyleSheet.create({
   receiptValueSmall: { fontSize: 10, color: '#888', fontFamily: 'monospace', flex: 1, textAlign: 'right' },
   bottomSpace: { height: 40 },
 });
+
+
+
 
