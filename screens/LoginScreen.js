@@ -86,7 +86,7 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
             // Different device — block login
             setNotice({
               type: 'error',
-              title: 'ðŸ”’ Device Not Recognised',
+              title: '🔒 Device Not Recognised',
               message: 'This account is active on another device. Contact Mzansiway support at admin@mzansiway.co.za to transfer your account.'
             });
             setLoading(false);

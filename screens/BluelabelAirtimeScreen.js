@@ -385,7 +385,6 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           </Pressable>
           <View style={styles.bottomSpace} />
         </ScrollView>
-        </>
       )}
 
       {stage === 'success' && purchaseResult && (

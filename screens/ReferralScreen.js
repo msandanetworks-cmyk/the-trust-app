@@ -64,7 +64,7 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
         <TouchableOpacity style={styles.modeToggle} onPress={t.toggle}>
           <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🔑'}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ðŸŽ¯ Referral Program</Text>
+        <Text style={styles.title}>🎯 Referral Program</Text>
         <Text style={styles.subtitle}>Earn commission on all referral purchases</Text>
       </View>
 
@@ -83,7 +83,7 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
         </View>
 
         <TouchableOpacity style={styles.copyButton} onPress={handleCopyCode}>
-          <Text style={styles.copyButtonText}>ðŸ“‹ Copy My Number</Text>
+          <Text style={styles.copyButtonText}>📋 Copy My Number</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
@@ -111,12 +111,12 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
       </View>
 
       <View style={[styles.infoCard, { backgroundColor: t.darkMode ? '#1A2F1A' : '#e8fff0' }]}>
-        <Text style={styles.infoTitle}>ðŸ† How It Works</Text>
+        <Text style={styles.infoTitle}>🏆 How It Works</Text>
         <Text style={[styles.infoText, { color: t.text }]}>• Share your cell number or QR code</Text>
         <Text style={[styles.infoText, { color: t.text }]}>• Friend registers using your number</Text>
         <Text style={[styles.infoText, { color: t.text }]}>• When they purchase, you earn commission</Text>
         <Text style={[styles.infoText, { color: t.text }]}>• Commission goes to your Cash Wallet</Text>
-        <Text style={[styles.infoText, { color: t.text }]}>• Spend Cash Wallet to earn PV points!</Text>
+        <Text style={[styles.infoText, { color: t.text }]}>• Spend Cash Wallet to earn HP points!</Text>
       </View>
 
       <View style={[styles.exampleCard, { backgroundColor: t.card2 }]}>
@@ -132,7 +132,9 @@ export default function ReferralScreen({ userData, onBack, theme, onHideTabBar, 
       </View>
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
-    </ScrollView>
+
+      
+      </ScrollView>
   );
 }
 

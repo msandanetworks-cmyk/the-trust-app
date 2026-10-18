@@ -366,28 +366,28 @@ function AppInner() {
        currentScreen !== 'accountant-dashboard' && (
         <Animated.View style={[styles.tabBar, { backgroundColor: theme.tabBg, borderTopColor: theme.tabBorder, transform: [{ translateY: tabBarAnim }], paddingBottom: Math.max(insets.bottom, 16) }]}>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('dashboard')}>
-            <Text style={styles.tabIcon}>ðŸ </Text>
+            <Text style={styles.tabIcon}>🏠</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Home</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('topup')}>
-            <Text style={styles.tabIcon}>ðŸ’³</Text>
+            <Text style={styles.tabIcon}>💳</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Top Up</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('store')}>
-            <Text style={styles.tabIcon}>ðŸ›’</Text>
+            <Text style={styles.tabIcon}>🛒</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Store</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('referral')}>
-            <Text style={styles.tabIcon}>ðŸ‘¥</Text>
+            <Text style={styles.tabIcon}>👥</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Referrals</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('propertyregister')}>
-            <Text style={styles.tabIcon}>ðŸ˜ï¸</Text>
+            <Text style={styles.tabIcon}>🏘️</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Properties</Text>
           </TouchableOpacity>
           {userData && userData.isAdmin && (
             <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('audit')}>
-              <Text style={styles.tabIcon}>ðŸ”</Text>
+              <Text style={styles.tabIcon}>📊</Text>
               <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Audit</Text>
             </TouchableOpacity>
           )}
