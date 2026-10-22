@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import Notice from '../components/Notice';
 
@@ -81,12 +81,10 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
             })
           });
           const bindData = await bindResponse.json();
-
-          if (!bindData.success && bindData.deviceBlocked && phoneNumber !== '0800000001') {
-            // Different device — block login
+          if (!bindData.success && bindData.conflict) {
             setNotice({
               type: 'error',
-              title: '🔒 Device Not Recognised',
+              title: 'Device Not Authorised',
               message: 'This account is active on another device. Contact Mzansiway support at admin@mzansiway.co.za to transfer your account.'
             });
             setLoading(false);
@@ -156,9 +154,8 @@ export default function LoginScreen({ onLoginSuccess, onBack, theme, onHideTabBa
       </View>
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
-      
-      
-      </ScrollView>
+
+    </ScrollView>
   );
 }
 
@@ -181,9 +178,8 @@ const styles = StyleSheet.create({
   passwordRow: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 2, marginBottom: 15 },
   passwordInput: { flex: 1, padding: 16, fontSize: 18 },
   eyeButton: { padding: 12, paddingRight: 16 },
-  eyeText: { fontSize: 20 },
+  eyeText: { fontSize: 16, color: '#FF9800', fontWeight: 'bold' },
   submitBtn: { backgroundColor: '#FF9800', padding: 18, borderRadius: 12, alignItems: 'center', marginBottom: 12 },
   submitBtnText: { color: '#ffffff', fontSize: 18, fontWeight: 'bold' },
   backBtn: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#FF9800', padding: 14, borderRadius: 12, alignItems: 'center', marginBottom: 20 },
 });
-

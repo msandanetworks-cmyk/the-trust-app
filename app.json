@@ -39,13 +39,8 @@
         "projectId": "9cfed585-b6d4-4376-a014-cf3c231a16dd"
       }
     },
-           "expo-notifications",
-        {
-          "icon": "./assets/mzansiway_app_icon.png",
-          "color": "#003865",
-          "sounds": []
-        }
-      ]
+    "plugins": [
+      "./plugins/withR8Config"
     ]
   }
 }

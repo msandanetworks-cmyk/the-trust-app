@@ -20,11 +20,7 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
 
   return (
     <ScrollView
-      style={[styles.container
-      {/* SA Suburb Watermark */}
-      <View style={{position:"absolute",top:0,left:0,right:0,bottom:0,overflow:"hidden",zIndex:0,opacity:0.04,pointerEvents:"none"}}>
-        {["Sandton","Soweto","Randburg","Midrand","Centurion","Roodepoort","Benoni","Boksburg","Germiston","Krugersdorp","Alberton","Springs","Kempton Park","Edenvale","Fourways","Bryanston","Rosebank","Melrose","Parktown","Alexandra","Diepsloot","Tembisa","Katlehong","Vosloorus","Lenasia","Eldorado Park","Dobsonville","Meadowlands","Pimville","Morningside","Illovo","Hyde Park","Houghton","Northcliff","Honeydew","Cosmo City","Naturena","Ennerdale","Protea Glen","Orange Farm"].map((s,i)=>(<Text key={i} style={{position:"absolute",top:(i%13)*52+10,left:(i%3)*110+8,fontSize:11,fontWeight:"600",color:"#006400",transform:[{rotate:i%2===0?"-8deg":"4deg"}]}}>{s}</Text>))}
-      </View>, { backgroundColor: t.bg }]}
+      style={[styles.container, { backgroundColor: t.bg }]}
       contentContainerStyle={styles.content}
       onScroll={_handleScroll} scrollEventThrottle={16}>
 
@@ -45,7 +41,7 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
         </TouchableOpacity>
 
         <Text style={styles.sub}>
-          Shop. Earn Benefits. Own your home.
+          Shop. Earn Home Points. Own your home.
         </Text>
       </LinearGradient>
 
@@ -75,7 +71,9 @@ export default function WelcomeScreen({ onLogin, onRegister, onBusinessPortal, t
       <Text style={{ textAlign: 'center', color: '#999', fontSize: 11, marginTop: 8, marginBottom: 4, paddingHorizontal: 16 }}>
         Powered by Blue Label, Checkers and Shoprite
       </Text>
-    </ScrollView>
+
+      
+      </ScrollView>
   );
 }
 

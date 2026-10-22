@@ -1,28 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Image, View, Text, TextInput, Pressable, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { Image, View, Text, TextInput, Pressable, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Linking } from 'react-native';
 
 const API_BASE = 'https://mzansiway-backend-production.up.railway.app';
 
-const SUCCESS_MESSAGES = {
-  'isiZulu':     (name, product) => 'Siyabonga ' + name + '! U-' + product + ' uthunyelwe ngempumelelo. Qhubeka uthenga ukuze uqoqe amaphuzu ayo yakho indlu!',
-  'isiXhosa':    (name, product) => 'Enkosi ' + name + '! I-' + product + ' ithunyelwe ngempumelelo. Qhubeka uthenga ukuze uqoqe amaphuzu endlu yakho!',
-  'Afrikaans':   (name, product) => 'Dankie ' + name + '! ' + product + ' is suksesvol gestuur. Hou aan koop om punte vir jou huis te verdien!',
-  'English':     (name, product) => 'Thank you ' + name + '! Your ' + product + ' was sent successfully. Keep shopping to earn points toward your home!',
-  'Sepedi':      (name, product) => 'Ke a leboga ' + name + '! ' + product + ' e rometswe ka katlego. Tswela pele go reka go hweditsa dintlha tsa ga geno!',
-  'Setswana':    (name, product) => 'Ke a leboga ' + name + '! ' + product + ' e romilwe ka katlego. Tswelela go reka go bona dintlha tsa ntlo ya gago!',
-  'Sesotho':     (name, product) => 'Ke a leboha ' + name + '! ' + product + ' e rometswe ka katleho. Tswela pele ho reka ho fumana dintlha tsa hao!',
-  'Xitsonga':    (name, product) => 'Inkomu ' + name + '! ' + product + ' yi rhumeriwe hi ndlela yo tsakisa. Tshika ku xava ku kuma tinhlamulo ta yindlu ya wena!',
-  'siSwati':     (name, product) => 'Siyabonga ' + name + '! I-' + product + ' ithunyelwe ngemphumelelo. Qhubeka uthenga kuze utfole emazinge endlu yakho!',
-  'Tshivenda':   (name, product) => 'Ndo livhuwa ' + name + '! ' + product + ' yo rumwa nga ndila yo takutsedzaho. Bvela phanḓa u wana tshikalo tsha nnḓu yau!',
-  'isiNdebele':  (name, product) => 'Siyabonga ' + name + '! I-' + product + ' ithunyelwe ngempumelelo. Qhubeka uthenga ukuze uqoqe amaphuzu wendlu yakho!',
+// APPROVED MOTIVATIONAL MESSAGES — Mzansiway NPC
+// Source: Mzansiway_Multilingual_Payment_Messages_v4.pdf
+// Varies by language AND residence type (FREE / RENT / BOND)
+// OWN = no message shown
+const FREE_MESSAGES = {
+  'isiZulu':    'Ngizowuthola owami umuzi',
+  'isiXhosa':   'Ndizobanalo ikhaya lam',
+  'Afrikaans':  'Ek sal my eie huis kry.',
+  'English':    'I will get my own home.',
+  'Sepedi':     'Ke tla reka motse Waka',
+  'Setswana':   'Ke tla NNA le ntlo ya ka.',
+  'Sesotho':    'Ke haha waka motse.',
+  'Xitsonga':   'Nita xava ya mina yindlo',
+  'siSwati':    'Ngitawutfola likhaya lami',
+  'Tshivenda':  'Ndido wana nndu yanga.',
+  'isiNdebele': 'Ngizowuthola umuzi uthi mina no nofana wami',
 };
-
-function getSuccessMessage(homeLanguage, name, product) {
-  const firstName = name ? name.split(' ')[0] : 'Member';
-  const fn = SUCCESS_MESSAGES[homeLanguage] || SUCCESS_MESSAGES['English'];
-  return fn(firstName, product);
+const RENT_MESSAGES = {
+  'isiZulu':    'Ziyaphela izinsuku zikamastende',
+  'isiXhosa':   'Intsuku zika masandi zibaliwe',
+  'Afrikaans':  'Die verhuurder se dae is getel.',
+  'English':    "The landlord's days are numbered.",
+  'Sepedi':     'Matsatsi aka agoba le landlord a kgauswi le go fela.',
+  'Setswana':   'Matsatsi a go patela Landlord a Fela.',
+  'Sesotho':    "A ke satla ba le kamano efeng le Mong’antlo kapa ho ba mohiri.",
+  'Xitsonga':   'Masiku ya mastende ya hlayiwini',
+  'siSwati':    'Tinsuku temninidlu wendzawo tibaliwe',
+  'Tshivenda':  'Maduvha a vhahirisi o vhaliwa',
+  'isiNdebele': 'Kuyaphela ukuqatjha maduze',
+};
+const BOND_MESSAGES = {
+  'isiZulu':    'Sizophuma ebugqileni be bond',
+  'isiXhosa':   'Ndizaygqiba le-bond ngenye imini',
+  'Afrikaans':  'Ons sal ontsnap om die verband te betaal.',
+  'English':    'We will escape the bondage of the bond.',
+  'Sepedi':     'Re tla ikhutsa morwalo wa bond.',
+  'Setswana':   'Re tla tswa Mo kgatellong ya bond.',
+  'Sesotho':    'Ha ke sale lekhoba la kadimo ea ntlo.',
+  'Xitsonga':   'Hita hambana naku bohiwa hi bond',
+  'siSwati':    'Sitawuphunyuka ebugcilini sesibopho',
+  'Tshivenda':  'Ridobva vhupulini ha zwikolodo zwa haya.',
+  'isiNdebele': 'Sidlula ekubhadeleni abanye iinkolodo zabo',
+};
+function getSuccessMessage(homeLanguage, name, residenceType) {
+  if (!residenceType || residenceType === 'own' || residenceType === 'OWN') return null;
+  let messages;
+  if (residenceType === 'free' || residenceType === 'FREE') messages = FREE_MESSAGES;
+  else if (residenceType === 'rent' || residenceType === 'RENT' || residenceType === 'renting') messages = RENT_MESSAGES;
+  else if (residenceType === 'bond' || residenceType === 'BOND') messages = BOND_MESSAGES;
+  else messages = RENT_MESSAGES;
+  return messages[homeLanguage] || messages['English'];
 }
-
 
 const NETWORKS = [
   { id: 'mtn', label: 'MTN', color: '#FFCB05', textColor: '#000000', logo: require('../assets/MTN_logo.png') },
@@ -38,7 +70,7 @@ const BANDS = [
   { id: 'all', label: 'All' }
 ];
 
-const DataBundlesScreen = ({ route, navigation, theme }) => {
+const DataBundlesScreen = ({route, navigation, theme, onHideTabBar, onShowTabBar}) => {
   const { memberNumber } = (route && route.params) ? route.params : {};
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -188,7 +220,7 @@ const DataBundlesScreen = ({ route, navigation, theme }) => {
       .then(function(data) {
         setPurchasing(false);
         if (data.success && data.redirectUrl) {
-          window.open(data.redirectUrl, '_blank');
+          Linking.openURL(data.redirectUrl);
           const payRequestId = data.payRequestId;
           setPendingCard({ bundle: selectedBundle, phone: phoneNumber, amount: amount, payRequestId: payRequestId });
           setPurchasing(false);
@@ -265,6 +297,16 @@ const DataBundlesScreen = ({ route, navigation, theme }) => {
       </Pressable>
     );
   };
+  const _lastScrollY = React.useRef(0);
+  const _handleScroll = React.useCallback(({ nativeEvent }) => {
+    const currentY = nativeEvent.contentOffset.y;
+    if (currentY > _lastScrollY.current + 5) {
+      onHideTabBar && onHideTabBar();
+    } else if (currentY < _lastScrollY.current - 5) {
+      onShowTabBar && onShowTabBar();
+    }
+    _lastScrollY.current = currentY;
+  }, [onHideTabBar, onShowTabBar]);
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
@@ -280,7 +322,7 @@ const DataBundlesScreen = ({ route, navigation, theme }) => {
 
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
         <Text style={[styles.sectionLabel, { color: t.subText }]}>Select Network</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
           {NETWORKS.map(function(n) {
@@ -331,7 +373,7 @@ const DataBundlesScreen = ({ route, navigation, theme }) => {
                 >
                   <Text style={styles.bundleAmount}>R{amount.toFixed(0)}</Text>
                   <Text style={[styles.bundleName, { color: t.text }]}>{p.name}</Text>
-                  <Text style={styles.bundlePV}>+{(amount * 0.0325).toFixed(2)} PV</Text>
+                  <Text style={styles.bundlePV}>+{(amount * 0.0325).toFixed(4)} pts</Text>
                 </TouchableOpacity>
               );
             })}
@@ -417,6 +459,8 @@ const DataBundlesScreen = ({ route, navigation, theme }) => {
         )}
 
         <View style={{ height: 40 }} />
+
+      
       </ScrollView>
     </View>
   );

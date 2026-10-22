@@ -466,7 +466,7 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
                 <DonutRing slices={fundSlices} size={140} total={totalFunds} />
                 <View style={s.legend}>
                   {[
-                    { label: 'Auction / Pool',  value: funds.auctionFund    || 0, color: ORANGE },
+                    { label: 'House Buying Fund',  value: funds.auctionFund    || 0, color: ORANGE },
                     { label: 'Operations',       value: funds.operationsFund  || 0, color: BLUE   },
                     { label: 'Salaries',         value: funds.salariesFund    || 0, color: GREEN  },
                     { label: 'Emergency',        value: funds.emergencyFund   || 0, color: RED    },
@@ -492,7 +492,7 @@ export default function AdminAuditScreen({ userData, onBack, theme, hideTabBar, 
               {totalFunds > 0 && (
                 <View style={{ marginTop: 10 }}>
                   {[
-                    { label: 'Auction / Pool',  value: funds.auctionFund    || 0, color: ORANGE },
+                    { label: 'House Buying Fund',  value: funds.auctionFund    || 0, color: ORANGE },
                     { label: 'Operations',       value: funds.operationsFund  || 0, color: BLUE   },
                     { label: 'Salaries',         value: funds.salariesFund    || 0, color: GREEN  },
                     { label: 'Emergency',        value: funds.emergencyFund   || 0, color: RED    },

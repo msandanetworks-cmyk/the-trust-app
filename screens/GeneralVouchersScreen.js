@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, Platform, View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { StyleSheet, Platform, View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Animated } from 'react-native';
 import Notice from '../components/Notice';
 
 const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
@@ -800,6 +800,24 @@ const SECTIONS = [
   { id: 'lifestyle', label: '🛍️ Lifestyle', color: '#FF9800' },
 ];
 
+
+const CONFETTI_COLORS=["#50C878","#FF9800","#FFD700","#00BFFF","#FF69B4","#ADFF2F"];
+const NUM_CONFETTI=30;
+function ConfettiPiece({delay}){
+  const anim=React.useRef(new Animated.Value(0)).current;
+  const x=React.useRef(Math.random()*340-20).current;
+  const size=React.useRef(6+Math.random()*8).current;
+  const color=React.useRef(CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]).current;
+  const rot=React.useRef(Math.random()*360).current;
+  React.useEffect(()=>{Animated.timing(anim,{toValue:1,duration:1800+Math.random()*800,delay,useNativeDriver:true}).start();},[]);
+  const tY=anim.interpolate({inputRange:[0,1],outputRange:[-20,700]});
+  const op=anim.interpolate({inputRange:[0,0.7,1],outputRange:[1,1,0]});
+  const sp=anim.interpolate({inputRange:[0,1],outputRange:[rot+"deg",(rot+720)+"deg"]});
+  return <Animated.View style={{position:"absolute",top:0,left:x,width:size,height:size,backgroundColor:color,borderRadius:2,opacity:op,transform:[{translateY:tY},{rotate:sp}]}} />;
+}
+function Confetti(){
+  return <View style={{position:"absolute",top:0,left:0,right:0,bottom:0,pointerEvents:"none",overflow:"hidden"}}>{Array.from({length:NUM_CONFETTI},(_,i)=><ConfettiPiece key={i} delay={i*60}/>)}</View>;
+}
 export default function GeneralVouchersScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [activeSection, setActiveSection] = useState('airtime');
 
@@ -1246,9 +1264,9 @@ export default function GeneralVouchersScreen({userData, onBack, theme, onHideTa
       </ScrollView>
 
       <Notice notice={notice} onClose={() => setNotice(null)} />
-      {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
-    </>
     </View>
+    {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
+  </>
   );
 }
 

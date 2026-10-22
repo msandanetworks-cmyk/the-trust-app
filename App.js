@@ -336,6 +336,7 @@ function AppInner() {
 
       {currentScreen === 'lifestyle-vouchers' && userData && (
         <LifestyleVouchersScreen
+          userData={userData}
           route={{ params: { memberNumber: userData.memberNumber, walletBalance: userData.cashWallet } }}
           navigation={{ goBack: () => { refreshUserData(); setCurrentScreen('store'); } }}
           theme={theme}

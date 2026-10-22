@@ -202,7 +202,7 @@ export default function DashboardScreen({ userData, onNavigate, onLogout, theme 
               })}
             </Svg>
             <View style={styles.donutCenter}>
-              <Text style={[styles.donutAuctionLabel, { color: t.text }]}>Title Deed Fund</Text>
+              <Text style={[styles.donutAuctionLabel, { color: t.text }]}>House-buying Fund</Text>
               <Text style={styles.donutAuctionValue}>R{auctionFund.toFixed(0)}</Text>
               <Text style={styles.donutMembers}>{totalMembers} {totalMembers === 1 ? 'Member' : 'Members'}</Text>
             </View>
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   actionBtn: { padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginBottom: 10, borderWidth: 1 },
   actionIcon: { fontSize: 24, marginRight: 12 },
   actionText: { fontSize: 14, fontWeight: 'bold' },
-  bottomSpace: { height: 100 },
+  bottomSpace: { height: 140 },
   tiersCard: { padding: 16, borderRadius: 12, marginBottom: 15, borderWidth: 2 },
   tiersHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   tiersTitle: { fontSize: 14, color: '#50C878', fontWeight: 'bold' },

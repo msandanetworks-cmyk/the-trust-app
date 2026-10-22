@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity } from 'react-native';
-import { WebView } from 'react-native-webview';
 
 const API_URL = 'https://mzansiway-backend-production.up.railway.app';
 
@@ -9,23 +8,6 @@ const NOTIFICATION_ICONS = {
   lifestyle: '🎁', draw: '🏆', system: '🔔', allocation: '🏠'
 };
 
-const SUCCESS_SOUND_HTML = `<!DOCTYPE html><html><body><script>
-window.onload=function(){
-  var a=new AudioContext();
-  function beep(f,t,v){
-    var o=a.createOscillator();
-    var g=a.createGain();
-    o.connect(g);g.connect(a.destination);
-    o.frequency.value=f;o.type='square';
-    g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(1.0,t+0.01);
-    g.gain.linearRampToValueAtTime(0,t+0.18);
-    o.start(t);o.stop(t+0.2);
-  }
-  var n=a.currentTime;
-  beep(880,n);beep(1109,n+0.2);beep(1318,n+0.4);
-};
-</script></body></html>`
 
 export default function NotificationScreen({ userData, onBack, onNavigate, theme, onHideTabBar, onShowTabBar }) {
   const _lastScrollY = useRef(0);
@@ -42,7 +24,6 @@ export default function NotificationScreen({ userData, onBack, onNavigate, theme
   if (!userData) return null;
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [playSound, setPlaySound] = useState(false);
 
   const t = theme || { bg: '#003865', card: '#0a2545', card2: '#082040', text: '#ffffff', subText: '#aaaaaa', darkMode: true };
 
@@ -55,7 +36,6 @@ export default function NotificationScreen({ userData, onBack, onNavigate, theme
       if (data.success) {
         setNotifications(data.notifications);
         const hasUnread = data.notifications.some(n => !n.read);
-        if (hasUnread) setPlaySound(true);
         await fetch(API_URL + '/api/notifications/mark-read/' + userData.memberNumber, { method: 'POST' });
       }
     } catch (err) { console.error('Notifications error:', err); }
@@ -83,15 +63,7 @@ export default function NotificationScreen({ userData, onBack, onNavigate, theme
 
   return (
     <View style={[styles.container, { backgroundColor: t.bg }]}>
-      {playSound && Platform.OS !== 'web' && (
-        <WebView
-          source={{ html: SUCCESS_SOUND_HTML }}
-          style={{ width: 1, height: 1, position: 'absolute', top: -100, left: -100, opacity: 0 }}
-          javaScriptEnabled={true}
-          mediaPlaybackRequiresUserAction={false}
-          allowsInlineMediaPlayback={true}
-        />
-      )}
+
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <TouchableOpacity onPress={onBack}>
           <Text style={styles.backArrow}>← Back</Text>
