@@ -1,9 +1,32 @@
 import React, { useState } from 'react';
-import { WebView } from 'react-native-webview';
-import { StyleSheet, Platform, Image as RNImage, View, Text, ScrollView, TextInput, Pressable, Animated } from 'react-native';
+import { StyleSheet, Image as RNImage, View, Text, ScrollView, TextInput, Pressable, Animated } from 'react-native';
 import Notice from '../components/Notice';
 
-const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
+const CONFETTI_COLORS = ['#50C878','#FF9800','#FFD700','#00BFFF','#FF69B4','#ADFF2F'];
+const NUM_CONFETTI = 30;
+function ConfettiPiece({ delay }) {
+  const anim = React.useRef(new Animated.Value(0)).current;
+  const x = React.useRef(Math.random() * 340 - 20).current;
+  const size = React.useRef(6 + Math.random() * 8).current;
+  const color = React.useRef(CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]).current;
+  const rot = React.useRef(Math.random() * 360).current;
+  React.useEffect(() => {
+    Animated.timing(anim, { toValue: 1, duration: 1800 + Math.random() * 800, delay, useNativeDriver: true }).start();
+  }, []);
+  const tY = anim.interpolate({ inputRange: [0, 1], outputRange: [-20, 700] });
+  const op = anim.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] });
+  const sp = anim.interpolate({ inputRange: [0, 1], outputRange: [rot + 'deg', (rot + 720) + 'deg'] });
+  return (
+    <Animated.View style={{ position: 'absolute', top: 0, left: x, width: size, height: size, backgroundColor: color, borderRadius: 2, opacity: op, transform: [{ translateY: tY }, { rotate: sp }] }} />
+  );
+}
+function Confetti() {
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+      {Array.from({ length: NUM_CONFETTI }, (_, i) => <ConfettiPiece key={i} delay={i * 60} />)}
+    </View>
+  );
+}
 
 // Success message in member's home language
 // APPROVED MOTIVATIONAL MESSAGES - Mzansiway NPC
@@ -101,7 +124,7 @@ function Confetti() {
 export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [selectedNetwork, setSelectedNetwork] = useState(null);
 
-  const [showSound, setShowSound] = useState(false);  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [sendToOther, setSendToOther] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber || '');
@@ -161,7 +184,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           newBalance: data.newBalance,
           pvEarned: data.pvEarned
         });
-        setTimeout(function() { setStage('success'); setShowSound(true); }, 80);
+        setTimeout(function() { setStage('success'); }, 80);
             } else if (data.poolDepleted) {
         setNotice({ type: 'error', title: 'System Error', message: "Don't panic! Your money is safe in your wallet. Please retry this transaction in 30 minutes." });
       } else {
@@ -416,62 +439,63 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
       )}
 
       {stage === 'success' && purchaseResult && (
-        <>
-        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90, minHeight: 600 }} onScroll={_handleScroll} scrollEventThrottle={16}>
-          <Confetti />
-          <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
-            <Text style={styles.successIcon}></Text>
-            <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, userData && userData.residenceType)}</Text>
-            <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} {purchaseResult.network} airtime sent to {purchaseResult.phoneNumber}</Text>
-            <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
-              <View style={styles.receiptRow}>
-                <Text style={[styles.receiptLabel, { color: t.text }]}>Recipient</Text>
-                <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.phoneNumber}</Text>
-              </View>
-              <View style={styles.receiptRow}>
-                <Text style={[styles.receiptLabel, { color: t.text }]}>Network</Text>
-                <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.network}</Text>
-              </View>
-              <View style={styles.receiptRow}>
-                <Text style={[styles.receiptLabel, { color: t.text }]}>Amount</Text>
-                <Text style={styles.receiptValueOrange}>R{purchaseResult.amount.toFixed(2)}</Text>
-              </View>
-              {userData && userData.creditType?.toLowerCase() !== 'health' ? (
-                <View style={styles.receiptRow}>
-                  <Text style={[styles.receiptLabel, { color: t.text }]}>Home Points</Text>
-                  <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+        >
+          <View style={{ position: 'relative', minHeight: 600 }}>
+            <Confetti />
+            <View style={{ padding: 20 }}>
+              <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
+                <Text style={styles.successIcon}>✅</Text>
+                <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, userData && userData.residenceType)}</Text>
+                <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} {purchaseResult.network} airtime sent to {purchaseResult.phoneNumber}</Text>
+                <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: t.text }]}>Recipient</Text>
+                    <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.phoneNumber}</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: t.text }]}>Network</Text>
+                    <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.network}</Text>
+                  </View>
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: t.text }]}>Amount</Text>
+                    <Text style={styles.receiptValueOrange}>R{purchaseResult.amount.toFixed(2)}</Text>
+                  </View>
+                  {userData && userData.creditType?.toLowerCase() !== 'health' ? (
+                    <View style={styles.receiptRow}>
+                      <Text style={[styles.receiptLabel, { color: t.text }]}>Home Points</Text>
+                      <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.receiptRow}>
+                      <Text style={[styles.receiptLabel, { color: t.text }]}>Health Credits</Text>
+                      <Text style={[styles.receiptValueGreen, { color: '#FF9800' }]}>+{((purchaseResult.pvEarned || 0) * 0.30).toFixed(2)}</Text>
+                    </View>
+                  )}
+                  <View style={styles.receiptRow}>
+                    <Text style={[styles.receiptLabel, { color: t.text }]}>New Wallet Balance</Text>
+                    <Text style={styles.receiptValueOrange}>R{(purchaseResult.newBalance || 0).toFixed(2)}</Text>
+                  </View>
+                  {purchaseResult.transactionId && (
+                    <View style={styles.receiptRow}>
+                      <Text style={[styles.receiptLabel, { color: t.text }]}>Reference</Text>
+                      <Text style={styles.receiptValueSmall}>{purchaseResult.transactionId}</Text>
+                    </View>
+                  )}
                 </View>
-              ) : (
-                <View style={styles.receiptRow}>
-                  <Text style={[styles.receiptLabel, { color: t.text }]}>Health Credits</Text>
-                  <Text style={[styles.receiptValueGreen, { color: '#FF9800' }]}>+{((purchaseResult.pvEarned || 0) * 0.30).toFixed(2)}</Text>
-                </View>
-              )}
-              <View style={styles.receiptRow}>
-                <Text style={[styles.receiptLabel, { color: t.text }]}>New Wallet Balance</Text>
-                <Text style={styles.receiptValueOrange}>R{(purchaseResult.newBalance || 0).toFixed(2)}</Text>
               </View>
-              {purchaseResult.transactionId && (
-                <View style={styles.receiptRow}>
-                  <Text style={[styles.receiptLabel, { color: t.text }]}>Reference</Text>
-                  <Text style={styles.receiptValueSmall}>{purchaseResult.transactionId}</Text>
-                </View>
-              )}
+              <Pressable style={styles.primaryBtn} onPress={handleDone}>
+                <Text style={styles.primaryBtnText}>Done</Text>
+              </Pressable>
             </View>
           </View>
-          <Pressable style={styles.primaryBtn} onPress={handleDone}>
-            <Text style={styles.primaryBtnText}>Done</Text>
-          </Pressable>
-          <View style={styles.bottomSpace} />
-
-
-      </ScrollView>
-        </>
+        </ScrollView>
       )}
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
     </View>
-    {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
   </>
   );
 }
