@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, View, Text, TouchableOpacity, Animated, Platform } from 'react-native';
 
@@ -375,7 +375,7 @@ function AppInner() {
        currentScreen !== 'admin' &&
        currentScreen !== 'accountant-login' &&
        currentScreen !== 'accountant-dashboard' && (
-        <Animated.View style={[styles.tabBar, { backgroundColor: theme.tabBg, borderTopColor: theme.tabBorder, transform: [{ translateY: tabBarAnim }], paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <Animated.View style={[styles.tabBar, { backgroundColor: theme.tabBg, borderTopColor: theme.tabBorder, transform: [{ translateY: tabBarAnim }], paddingBottom: insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 20 : 16) }]}>
           <TouchableOpacity style={styles.tabItem} onPress={() => setCurrentScreen('dashboard')}>
             <Text style={styles.tabIcon}>🏠</Text>
             <Text style={[styles.tabLabel, { color: theme.tabLabel }]}>Home</Text>
