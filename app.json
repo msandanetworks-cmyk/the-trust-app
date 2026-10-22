@@ -29,7 +29,18 @@
         "backgroundColor": "#003865"
       },
       "package": "com.mzansiway.app",
-      "versionCode": 23
+      "versionCode": 23,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "mzansiway"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
