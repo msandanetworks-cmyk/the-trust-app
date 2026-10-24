@@ -423,7 +423,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
                   <Text style={{ color: paymentMethod === 'card' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Card</Text>
                   <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Secure PayGate payment</Text>
                 </Pressable>
-                <Pressable onPress={function() { setPaymentMethod('gratitude'); }} style={{ flex: 1, minWidth: '90%', backgroundColor: paymentMethod === 'gratitude' ? (t.darkMode ? '#1A0F00' : '#fff8e8') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'gratitude' ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
+                <Pressable onPress={function() { setPaymentMethod('gratitude'); }} style={{ flex: 1, minWidth: '90', backgroundColor: paymentMethod === 'gratitude' ? (t.darkMode ? '#1A0F00' : '#fff8e8') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'gratitude' ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
                   <Text style={{ fontSize: 22, marginBottom: 4 }}>🙏</Text>
                   <Text style={{ color: paymentMethod === 'gratitude' ? '#FF9800' : t.text, fontSize: 14, fontWeight: 'bold' }}>Gratitude</Text>
                   <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Balance: R{(userData.gratitudeWallet || 0).toFixed(2)}</Text>
@@ -460,7 +460,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
           <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 120 }} onScroll={_handleScroll} scrollEventThrottle={16}>
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>🛒</Text>
-            <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, 'Shoprite Voucher')}</Text>
+            <Text style={styles.successTitle}>{Ziyaphela izinsuku zikamastende 🛒}</Text>
             <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} Shoprite voucher loaded!\n\nSent to: {purchaseResult.phoneNumber}\n\nOpen the Shoprite SA app to spend it.</Text>
             <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
               <View style={styles.receiptRow}>
