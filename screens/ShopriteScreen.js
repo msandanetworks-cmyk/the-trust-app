@@ -164,7 +164,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
       const response = await fetch(API_URL + '/api/paygate/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ memberNumber: userData.memberNumber, amount: cardAmount, email: userData.email })
+        body: JSON.stringify({ memberNumber: userData.memberNumber, amount: cardAmount, email: userData.email, productType: 'shoprite', phoneNumber: phoneNumber, shopriteAmount: cardAmount })
       });
       const data = await response.json();
 
@@ -313,6 +313,29 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
   return (
     <>
     <View style={[styles.container, { backgroundColor: t.bg }]}>
+      {/* Payment Success Overlay */}
+      {paymentSuccess && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: '#003865', zIndex: 999, justifyContent: 'center',
+          alignItems: 'center', padding: 32 }}>
+          <Text style={{ fontSize: 64, marginBottom: 20 }}>{'\u2705'}</Text>
+          <Text style={{ color: '#50C878', fontSize: 24, fontWeight: 'bold',
+            marginBottom: 12, textAlign: 'center' }}>Payment Successful!</Text>
+          <Text style={{ color: '#b8ccd8', fontSize: 16, textAlign: 'center',
+            marginBottom: 32, lineHeight: 24 }}>
+            Your Shoprite voucher is being processed and will be sent to your phone shortly.
+          </Text>
+          <TouchableOpacity
+            style={{ backgroundColor: '#50C878', borderRadius: 14, padding: 18,
+              width: '100%', alignItems: 'center', marginBottom: 12 }}
+            onPress={() => { setPaymentSuccess(false); navigation.goBack(); }}>
+            <Text style={{ color: '#003865', fontWeight: 'bold', fontSize: 16 }}>Back to Store</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ padding: 14 }} onPress={() => setPaymentSuccess(false)}>
+            <Text style={{ color: '#7a9bb5', fontSize: 14 }}>Dismiss</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <Pressable style={styles.backBtn} onPress={onBack}>
           <Text style={styles.backText}>← Back</Text>
@@ -400,7 +423,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
                   <Text style={{ color: paymentMethod === 'card' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Card</Text>
                   <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Secure PayGate payment</Text>
                 </Pressable>
-                <Pressable onPress={function() { setPaymentMethod('gratitude'); }} style={{ flex: 1, minWidth: '45%', backgroundColor: paymentMethod === 'gratitude' ? (t.darkMode ? '#1A0F00' : '#fff8e8') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'gratitude' ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
+                <Pressable onPress={function() { setPaymentMethod('gratitude'); }} style={{ flex: 1, minWidth: '90%', backgroundColor: paymentMethod === 'gratitude' ? (t.darkMode ? '#1A0F00' : '#fff8e8') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'gratitude' ? '#FF9800' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center' }}>
                   <Text style={{ fontSize: 22, marginBottom: 4 }}>🙏</Text>
                   <Text style={{ color: paymentMethod === 'gratitude' ? '#FF9800' : t.text, fontSize: 14, fontWeight: 'bold' }}>Gratitude</Text>
                   <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Balance: R{(userData.gratitudeWallet || 0).toFixed(2)}</Text>
@@ -438,7 +461,7 @@ export default function ShopriteScreen({userData, onBack, theme, onHideTabBar, o
           <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
             <Text style={styles.successIcon}>🛒</Text>
             <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, 'Shoprite Voucher')}</Text>
-            <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} loaded to MMA wallet for {purchaseResult.phoneNumber}. Check the Shoprite SA app to spend it.</Text>
+            <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} Shoprite voucher loaded!\n\nSent to: {purchaseResult.phoneNumber}\n\nOpen the Shoprite SA app to spend it.</Text>
             <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
               <View style={styles.receiptRow}>
                 <Text style={[styles.receiptLabel, { color: t.text }]}>Recipient</Text>
