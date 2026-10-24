@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, Pressable, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View, Text, ScrollView, TextInput, Pressable, TouchableOpacity, Linking, AppState, Vibration } from 'react-native';
 import Notice from '../components/Notice';
 import MzansiLogo from './MzansiLogo';
 
@@ -15,6 +15,9 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
   const [balance, setBalance] = useState(userData.cashWallet);
   const [notice, setNotice] = useState(null);
 
+  const awaitingPaymentRef = useRef(false);
+  const appStateRef = useRef(AppState.currentState);
+
   const t = theme || {
     bg: '#121212',
     card: '#1A1A1A',
@@ -24,6 +27,47 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
     darkMode: true,
     toggle: function() {}
   };
+
+  // Auto-refresh when user comes back to the app from the browser
+  useEffect(() => {
+    const handleAppStateChange = async (nextAppState) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === 'active' &&
+        awaitingPaymentRef.current
+      ) {
+        setTimeout(() => handleRefreshBalance(true), 1500);
+      }
+      appStateRef.current = nextAppState;
+    };
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, []);
+
+  // Handle deep link return from PayGate browser
+  useEffect(() => {
+    const handleDeepLink = ({ url }) => {
+      if (!url || !url.includes('payment-return')) return;
+      const status = url.includes('status=success') ? 'success'
+        : url.includes('status=cancelled') ? 'cancelled'
+        : url.includes('status=declined') ? 'declined'
+        : 'unknown';
+
+      if (status === 'success' && awaitingPaymentRef.current) {
+        setTimeout(() => handleRefreshBalance(true), 1500);
+      } else if (status === 'cancelled') {
+        setAwaitingPayment(false);
+        awaitingPaymentRef.current = false;
+        setNotice({ type: 'info', title: 'Payment Cancelled', message: 'Your payment was cancelled. Your wallet was not charged.' });
+      } else if (status === 'declined') {
+        setAwaitingPayment(false);
+        awaitingPaymentRef.current = false;
+        setNotice({ type: 'error', title: 'Payment Declined', message: 'Your bank declined the payment. No money left your account. Please try again or use a different card.' });
+      }
+    };
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+    return () => subscription.remove();
+  }, []);
 
   const handleTopUp = async () => {
     const amount = selectedAmount || parseFloat(customAmount);
@@ -40,12 +84,13 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
       });
       const data = await response.json();
       if (data.success && data.redirectUrl) {
-        window.open(data.redirectUrl, '_blank');
+        Linking.openURL(data.redirectUrl);
         setAwaitingPayment(true);
+        awaitingPaymentRef.current = true;
         setNotice({
           type: 'info',
           title: 'Complete Your Payment',
-          message: 'A secure PayGate payment page has opened. Complete the R' + amount.toFixed(2) + ' payment there, then come back and tap "Refresh Balance".'
+          message: 'A secure PayGate payment page has opened. Complete the R' + amount.toFixed(2) + ' payment — the app will update automatically when done.'
         });
       } else {
         setNotice({ type: 'error', title: 'Top-Up Unavailable', message: data.message || 'Could not start the payment. Please try again shortly.' });
@@ -56,8 +101,8 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
     setLoading(false);
   };
 
-  const handleRefreshBalance = async () => {
-    setLoading(true);
+  const handleRefreshBalance = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const response = await fetch(API_BASE + '/api/user/' + userData.memberNumber);
       const data = await response.json();
@@ -68,15 +113,19 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
         userData.cashWallet = fresh;
         if (changed) {
           setAwaitingPayment(false);
+          awaitingPaymentRef.current = false;
+          Vibration.vibrate([0, 200, 100, 300, 100, 500]);
           setPaymentSuccess(fresh);
-        } else {
+        } else if (!silent) {
           setNotice({ type: 'info', title: 'No Change Yet', message: 'Payment not confirmed yet. If you completed payment, wait a few seconds and refresh again.' });
         }
       }
     } catch (err) {
-      setNotice({ type: 'error', title: 'Connection Error', message: 'Could not refresh balance. Please try again.' });
+      if (!silent) {
+        setNotice({ type: 'error', title: 'Connection Error', message: 'Could not refresh balance. Please try again.' });
+      }
     }
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
   if (paymentSuccess !== null) {
@@ -123,7 +172,7 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
 
         {awaitingPayment && (
           <View style={[styles.noteCard, { backgroundColor: t.darkMode ? '#2A2410' : '#fff8e0', borderColor: '#FF9800' }]}>
-            <Text style={[styles.noteText, { color: t.text }]}>Payment in progress — complete it in the opened tab, then tap Refresh Balance below.</Text>
+            <Text style={[styles.noteText, { color: t.text }]}>Payment in progress — complete it in the browser. The app will update automatically when done.</Text>
           </View>
         )}
 
@@ -166,7 +215,7 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
 
         <TouchableOpacity
           style={[styles.refreshButton, { opacity: loading ? 0.6 : 1 }]}
-          onPress={loading ? null : handleRefreshBalance}
+          onPress={loading ? null : () => handleRefreshBalance(false)}
           disabled={loading}
         >
           <Text style={styles.refreshButtonText}>Refresh Balance</Text>
@@ -207,4 +256,3 @@ const styles = StyleSheet.create({
   refreshButton: { padding: 16, borderRadius: 12, alignItems: 'center', marginBottom: 40, borderWidth: 2, borderColor: '#50C878', backgroundColor: 'transparent' },
   refreshButtonText: { color: '#50C878', fontSize: 16, fontWeight: 'bold' },
 });
-

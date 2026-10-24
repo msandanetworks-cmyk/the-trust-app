@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, Pressable, TouchableOpacity, Linking, AppState } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput, Pressable, TouchableOpacity, Linking, AppState, Vibration } from 'react-native';
 import Notice from '../components/Notice';
 import MzansiLogo from './MzansiLogo';
 
@@ -114,6 +114,7 @@ export default function WalletTopUpScreen({ userData, onBack, theme }) {
         if (changed) {
           setAwaitingPayment(false);
           awaitingPaymentRef.current = false;
+          Vibration.vibrate([0, 200, 100, 300, 100, 500]);
           setPaymentSuccess(fresh);
         } else if (!silent) {
           setNotice({ type: 'info', title: 'No Change Yet', message: 'Payment not confirmed yet. If you completed payment, wait a few seconds and refresh again.' });
