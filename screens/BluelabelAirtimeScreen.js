@@ -1,35 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image as RNImage, View, Text, ScrollView, TextInput, Pressable, Animated } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { StyleSheet, Platform, Image as RNImage, View, Text, ScrollView, TextInput, Pressable } from 'react-native';
 import Notice from '../components/Notice';
 
-const CONFETTI_COLORS = ['#50C878','#FF9800','#FFD700','#00BFFF','#FF69B4','#ADFF2F'];
-const NUM_CONFETTI = 30;
-function ConfettiPiece({ delay }) {
-  const anim = React.useRef(new Animated.Value(0)).current;
-  const x = React.useRef(Math.random() * 340 - 20).current;
-  const size = React.useRef(6 + Math.random() * 8).current;
-  const color = React.useRef(CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]).current;
-  const rot = React.useRef(Math.random() * 360).current;
-  React.useEffect(() => {
-    Animated.timing(anim, { toValue: 1, duration: 1800 + Math.random() * 800, delay, useNativeDriver: true }).start();
-  }, []);
-  const tY = anim.interpolate({ inputRange: [0, 1], outputRange: [-20, 700] });
-  const op = anim.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] });
-  const sp = anim.interpolate({ inputRange: [0, 1], outputRange: [rot + 'deg', (rot + 720) + 'deg'] });
-  return (
-    <Animated.View style={{ position: 'absolute', top: 0, left: x, width: size, height: size, backgroundColor: color, borderRadius: 2, opacity: op, transform: [{ translateY: tY }, { rotate: sp }] }} />
-  );
-}
-function Confetti() {
-  return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      {Array.from({ length: NUM_CONFETTI }, (_, i) => <ConfettiPiece key={i} delay={i * 60} />)}
-    </View>
-  );
-}
+const SUCCESS_SOUND_HTML = '<!DOCTYPE html><html><body><script>var ctx=new(window.AudioContext||window.webkitAudioContext)();function p(f,s,d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(0,ctx.currentTime+s);g.gain.linearRampToValueAtTime(1.0,ctx.currentTime+s+0.05);g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);o.start(ctx.currentTime+s);o.stop(ctx.currentTime+s+d+0.1);}p(523.25,0,0.15);p(659.25,0.18,0.15);p(783.99,0.36,0.3);<\/script></body></html>';
 
 // Success message in member's home language
-// APPROVED MOTIVATIONAL MESSAGES - Mzansiway NPC
+// APPROVED MOTIVATIONAL MESSAGES ΓÇö Mzansiway NPC
 // Source: Mzansiway_Multilingual_Payment_Messages_v4.pdf
 // Varies by language AND residence type (FREE / RENT / BOND)
 // OWN = no message shown
@@ -53,7 +30,7 @@ const RENT_MESSAGES = {
   'English':    "The landlord's days are numbered.",
   'Sepedi':     'Matsatsi aka agoba le landlord a kgauswi le go fela.',
   'Setswana':   'Matsatsi a go patela Landlord a Fela.',
-  'Sesotho':    "A ke satla ba le kamano efeng le Mong'antlo kapa ho ba mohiri.",
+  'Sesotho':    "A ke satla ba le kamano efeng le MongΓÇÖantlo kapa ho ba mohiri.",
   'Xitsonga':   'Masiku ya mastende ya hlayiwini',
   'siSwati':    'Tinsuku temninidlu wendzawo tibaliwe',
   'Tshivenda':  'Maduvha a vhahirisi o vhaliwa',
@@ -98,7 +75,7 @@ const AMOUNTS = [10, 20, 29, 50, 100, 200];
 export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideTabBar, onShowTabBar}) {
   const [selectedNetwork, setSelectedNetwork] = useState(null);
 
-  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [showSound, setShowSound] = useState(false);  const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [sendToOther, setSendToOther] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber || '');
@@ -158,7 +135,7 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           newBalance: data.newBalance,
           pvEarned: data.pvEarned
         });
-        setTimeout(function() { setStage('success'); }, 80);
+        setStage('success'); setShowSound(true);
             } else if (data.poolDepleted) {
         setNotice({ type: 'error', title: 'System Error', message: "Don't panic! Your money is safe in your wallet. Please retry this transaction in 30 minutes." });
       } else {
@@ -286,10 +263,10 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
     <View style={[styles.container, { backgroundColor: t.bg }]}>
       <View style={[styles.header, { backgroundColor: t.card }]}>
         <Pressable style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backText}>{'< Back'}</Text>
+          <Text style={styles.backText}>ΓåÉ Back</Text>
         </Pressable>
         <Pressable style={styles.modeToggle} onPress={t.toggle}>
-          <Text style={styles.modeToggleText}>{t.darkMode ? '☀️' : '🌙'}</Text>
+          <Text style={styles.modeToggleText}>{t.darkMode ? 'ΓÿÇ∩╕Å' : '≡ƒîÖ'}</Text>
         </Pressable>
         <View style={styles.logoRow}>
 
@@ -367,12 +344,12 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
           <Text style={styles.label}>Pay With</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 15 }}>
             <Pressable onPress={function() { setPaymentMethod('wallet'); }} style={{ flex: 1, minWidth: 90, backgroundColor: paymentMethod === 'wallet' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'wallet' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center', minWidth: 90 }}>
-              <Text style={{ fontSize: 22, marginBottom: 4 }}>👛</Text>
+              <Text style={{ fontSize: 22, marginBottom: 4 }}>≡ƒæ¢</Text>
               <Text style={{ color: paymentMethod === 'wallet' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Wallet</Text>
               <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Balance: R{userData.cashWallet.toFixed(2)}</Text>
             </Pressable>
             <Pressable onPress={function() { setPaymentMethod('card'); }} style={{ flex: 1, minWidth: 90, backgroundColor: paymentMethod === 'card' ? (t.darkMode ? '#1A2F1A' : '#e8fff0') : (t.darkMode ? '#082040' : '#ffffff'), borderWidth: 2, borderColor: paymentMethod === 'card' ? '#50C878' : (t.darkMode ? '#0d2d50' : '#dddddd'), borderRadius: 12, padding: 14, alignItems: 'center', minWidth: 90 }}>
-              <Text style={{ fontSize: 22, marginBottom: 4 }}>💳</Text>
+              <Text style={{ fontSize: 22, marginBottom: 4 }}>≡ƒÆ│</Text>
               <Text style={{ color: paymentMethod === 'card' ? '#50C878' : t.text, fontSize: 14, fontWeight: 'bold' }}>Card</Text>
               <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Secure PayGate</Text>
             </Pressable>
@@ -389,16 +366,16 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
                   alignItems: 'center'
                 }}
             >
-              <Text style={{ fontSize: 22, marginBottom: 4 }}>🙏</Text>
+              <Text style={{ fontSize: 22, marginBottom: 4 }}>≡ƒÖÅ</Text>
               <Text style={{ color: paymentMethod === 'gratitude' ? '#FF9800' : t.text, fontSize: 14, fontWeight: 'bold' }}>Gratitude</Text>
               <Text style={{ color: t.subText, fontSize: 11, marginTop: 2 }}>Balance: R{(userData.gratitudeWallet || 0).toFixed(2)}</Text>
             </Pressable>
           </View>
           {pendingCard && (
             <View style={{ backgroundColor: t.darkMode ? '#1A2800' : '#fff8e1', borderRadius: 10, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FF9800' }}>
-              <Text style={{ color: '#FF9800', fontSize: 13, textAlign: 'center', marginBottom: 10 }}># Complete your R{pendingCard.amount.toFixed(2)} PayGate payment, then tap below.</Text>
+              <Text style={{ color: '#FF9800', fontSize: 13, textAlign: 'center', marginBottom: 10 }}>≡ƒÆ│ Complete your R{pendingCard.amount.toFixed(2)} PayGate payment, then tap below.</Text>
               <Pressable onPress={handleCompleteCardPurchase} disabled={purchasing} style={{ backgroundColor: '#FF9800', padding: 14, borderRadius: 10, alignItems: 'center' }}>
-                <Text style={{ color: '#fff', fontWeight: 'bold' }}>{purchasing ? 'Checking...' : 'I Paid - Complete Purchase'}</Text>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>{purchasing ? 'Checking...' : 'I Paid ΓÇö Complete Purchase'}</Text>
               </Pressable>
               <Pressable onPress={function() { setPendingCard(null); }} style={{ marginTop: 8, alignItems: 'center' }}>
                 <Text style={{ color: t.subText, fontSize: 12 }}>Cancel</Text>
@@ -406,70 +383,68 @@ export default function BluelabelAirtimeScreen({userData, onBack, theme, onHideT
             </View>
           )}
           <Pressable style={[styles.primaryBtn, purchasing && styles.disabled]} onPress={handlePurchase} disabled={purchasing}>
-            <Text style={styles.primaryBtnText}>{purchasing ? 'Processing...' : paymentMethod === 'card' ? 'Pay with Card - R' + (getAmount() || 0).toFixed(2) : 'Buy Airtime'}</Text>
+            <Text style={styles.primaryBtnText}>{purchasing ? 'Processing...' : paymentMethod === 'card' ? 'Pay with Card ΓÇö R' + (getAmount() || 0).toFixed(2) : 'Buy Airtime'}</Text>
           </Pressable>
           <View style={styles.bottomSpace} />
         </ScrollView>
       )}
 
       {stage === 'success' && purchaseResult && (
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
-        >
-          <View style={{ position: 'relative', minHeight: 600 }}>
-            <Confetti />
-            <View style={{ padding: 20 }}>
-              <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
-                <Text style={styles.successIcon}>✅</Text>
-                <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, userData && userData.residenceType)}</Text>
-                <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} {purchaseResult.network} airtime sent to {purchaseResult.phoneNumber}</Text>
-                <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
-                  <View style={styles.receiptRow}>
-                    <Text style={[styles.receiptLabel, { color: t.text }]}>Recipient</Text>
-                    <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.phoneNumber}</Text>
-                  </View>
-                  <View style={styles.receiptRow}>
-                    <Text style={[styles.receiptLabel, { color: t.text }]}>Network</Text>
-                    <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.network}</Text>
-                  </View>
-                  <View style={styles.receiptRow}>
-                    <Text style={[styles.receiptLabel, { color: t.text }]}>Amount</Text>
-                    <Text style={styles.receiptValueOrange}>R{purchaseResult.amount.toFixed(2)}</Text>
-                  </View>
-                  {userData && userData.creditType?.toLowerCase() !== 'health' ? (
-                    <View style={styles.receiptRow}>
-                      <Text style={[styles.receiptLabel, { color: t.text }]}>Home Points</Text>
-                      <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
-                    </View>
-                  ) : (
-                    <View style={styles.receiptRow}>
-                      <Text style={[styles.receiptLabel, { color: t.text }]}>Health Credits</Text>
-                      <Text style={[styles.receiptValueGreen, { color: '#FF9800' }]}>+{((purchaseResult.pvEarned || 0) * 0.30).toFixed(2)}</Text>
-                    </View>
-                  )}
-                  <View style={styles.receiptRow}>
-                    <Text style={[styles.receiptLabel, { color: t.text }]}>New Wallet Balance</Text>
-                    <Text style={styles.receiptValueOrange}>R{(purchaseResult.newBalance || 0).toFixed(2)}</Text>
-                  </View>
-                  {purchaseResult.transactionId && (
-                    <View style={styles.receiptRow}>
-                      <Text style={[styles.receiptLabel, { color: t.text }]}>Reference</Text>
-                      <Text style={styles.receiptValueSmall}>{purchaseResult.transactionId}</Text>
-                    </View>
-                  )}
-                </View>
+        <>
+        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 90 }} onScroll={_handleScroll} scrollEventThrottle={16}>
+          <View style={[styles.successCard, { backgroundColor: t.card2 }]}>
+            <Text style={styles.successIcon}>≡ƒô▒</Text>
+            <Text style={styles.successTitle}>{getSuccessMessage(userData && userData.homeLanguage, userData && userData.fullName, userData && userData.residenceType)}</Text>
+            <Text style={[styles.successSubtitle, { color: t.text }]}>R{purchaseResult.amount.toFixed(2)} {purchaseResult.network} airtime sent to {purchaseResult.phoneNumber}</Text>
+            <View style={[styles.receiptBox, { backgroundColor: t.darkMode ? '#0A1628' : '#e8f4ff', borderColor: t.darkMode ? '#003865' : '#a0c4ff' }]}>
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: t.text }]}>Recipient</Text>
+                <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.phoneNumber}</Text>
               </View>
-              <Pressable style={styles.primaryBtn} onPress={handleDone}>
-                <Text style={styles.primaryBtnText}>Done</Text>
-              </Pressable>
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: t.text }]}>Network</Text>
+                <Text style={[styles.receiptValue, { color: t.text }]}>{purchaseResult.network}</Text>
+              </View>
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: t.text }]}>Amount</Text>
+                <Text style={styles.receiptValueOrange}>R{purchaseResult.amount.toFixed(2)}</Text>
+              </View>
+              {userData && userData.creditType?.toLowerCase() !== 'health' ? (
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Home Points</Text>
+                  <Text style={styles.receiptValueGreen}>+{((purchaseResult.pvEarned || 0) * 0.70).toFixed(2)}</Text>
+                </View>
+              ) : (
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Health Credits</Text>
+                  <Text style={[styles.receiptValueGreen, { color: '#FF9800' }]}>+{((purchaseResult.pvEarned || 0) * 0.30).toFixed(2)}</Text>
+                </View>
+              )}
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: t.text }]}>New Wallet Balance</Text>
+                <Text style={styles.receiptValueOrange}>R{(purchaseResult.newBalance || 0).toFixed(2)}</Text>
+              </View>
+              {purchaseResult.transactionId && (
+                <View style={styles.receiptRow}>
+                  <Text style={[styles.receiptLabel, { color: t.text }]}>Reference</Text>
+                  <Text style={styles.receiptValueSmall}>{purchaseResult.transactionId}</Text>
+                </View>
+              )}
             </View>
           </View>
-        </ScrollView>
+          <Pressable style={styles.primaryBtn} onPress={handleDone}>
+            <Text style={styles.primaryBtnText}>Done</Text>
+          </Pressable>
+          <View style={styles.bottomSpace} />
+
+
+      </ScrollView>
+        </>
       )}
 
       <Notice notice={notice} onClose={function() { setNotice(null); }} />
     </View>
+    {showSound && Platform.OS !== 'web' && <WebView source={{html: SUCCESS_SOUND_HTML}} style={{width:0,height:0,position:'absolute',top:-9999,left:-9999}} javaScriptEnabled={true} mediaPlaybackRequiresUserAction={false} allowsInlineMediaPlayback={true} onLoad={()=>{setTimeout(()=>setShowSound(false),3500);}} />}
   </>
   );
 }
@@ -520,3 +495,5 @@ const styles = StyleSheet.create({
 
 
 
+
+C:\Users\User\Desktop\the-trust-app\frontend>
